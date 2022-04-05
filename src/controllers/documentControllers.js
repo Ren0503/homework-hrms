@@ -54,8 +54,6 @@ exports.updateDocument = asyncHandler(async (req, res) => {
     const document = await Document.findById(req.params.id)
 
     if (document) {
-        if (req.body.file)
-        
         deleteFile(document.url)
 
         document.url = req.file.path
