@@ -3,10 +3,10 @@ const passport = require('passport')
 const generateToken = require('../utils/generateToken')
 const router = express.Router()
 
-// @desc    Auth with Google
+/* NOTE: 100% automatic */
 router.get('/google', passport.authenticate('google', { scope: ['profile'] }))
 
-// @desc    Google auth callback
+/* NOTE: 100% automatic */
 router.get(
     '/google/callback',
     passport.authenticate('google', { failureRedirect: '/' }),

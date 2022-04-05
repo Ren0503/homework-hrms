@@ -6,8 +6,8 @@ const dotenv = require('dotenv')
 const morgan = require('morgan')
 const session = require('express-session')
 const passport = require('passport')
-const swaggerUI = require('swagger-ui-express')
-const swaggerJsDoc = require('swagger-jsdoc')
+const swaggerUi = require('swagger-ui-express')
+const swaggerFile = require('./swagger-output.json')
 const { notFound, errorHandler } = require('./middleware/errorMiddleware')
 
 dotenv.config()
@@ -36,8 +36,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Swagger UI
-const specs = require('./config/swagger')
-app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs))
+app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 
 // Sessions
 app.use(
@@ -53,10 +52,8 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 // Routes
-app.use('/api/admin', require('./routes/adminRoutes'))
-app.use('/api/auth', require('./routes/authRoutes'))
-app.use('/api/user', require('./routes/userRoutes'))
-app.use('/api/document', require('./routes/docRoutes'))
+const router = require("./routes/index");
+app.use(router);
 
 __dirname = path.resolve()
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')))

@@ -5,10 +5,12 @@ const DocCtrl = require('../controllers/documentControllers')
 const { protect, admin } = require('../middleware/authMiddleware')
 const { uploadFile } = require('../utils/files')
 
+/* NOTE: 100% automatic */
 router.route('/')
     .get(protect, admin, DocCtrl.getDocumentsByAdmin)
     .post(protect, admin, uploadFile.single('file'), DocCtrl.createDocument)
 
+/* NOTE: 100% automatic */
 router.route('/:id')
     .get(protect, admin, DocCtrl.getDocumentById)
     .put(protect, admin, uploadFile.single('file'), DocCtrl.updateDocument)

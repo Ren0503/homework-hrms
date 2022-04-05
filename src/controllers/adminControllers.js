@@ -32,6 +32,35 @@ exports.loginForAdmin = asyncHandler(async (req, res) => {
     }
 })
 
+// For test
+exports.registerUser = asyncHandler(async (req, res) => {
+    const { name, password } = req.body
+
+    const userExists = await User.findOne({ name })
+
+    if (userExists) {
+        res.status(400)
+        throw new Error('User already exists')
+    }
+
+    const user = await User.create({
+        name,
+        password,
+        role: 9,
+    })
+
+    if (user) {
+        res.status(201).json({
+            _id: user._id,
+            name: user.name,
+            token: generateToken(user._id),
+        })
+    } else {
+        res.status(400)
+        throw new Error('Invalid user data')
+    }
+})
+
 
 // @desc    Get list of user
 // @route   GET /api/admin/documents/:id/users

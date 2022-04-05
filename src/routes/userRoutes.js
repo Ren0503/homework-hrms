@@ -4,12 +4,15 @@ const router = express.Router()
 const UserCtrl = require('../controllers/userControllers')
 const { protect } = require('../middleware/authMiddleware')
 
+/* NOTE: 100% automatic */
 router.route('/documents')
     .get(protect, UserCtrl.getDocumentsByUser)
 
+/* NOTE: 100% automatic */
 router.route('/documents/:id/confirm')
     .get(protect, UserCtrl.confirmDocument)
 
+/* NOTE: 100% automatic */
 router.route('/documents/:id')
     .get(protect, UserCtrl.readingDocument)
 
