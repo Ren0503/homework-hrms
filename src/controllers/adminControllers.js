@@ -99,7 +99,7 @@ exports.assignUserForDocument = asyncHandler(async (req, res) => {
         const [...users] = req.body.userIds
 
         users.forEach(function (ele) {
-            ele.document = req.params.id
+            ele.docId = req.params.id
         })
 
         const confirms = await Confirm.insertMany(users);

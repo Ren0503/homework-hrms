@@ -4,6 +4,8 @@ const router = express.Router()
 const UserCtrl = require('../controllers/userControllers')
 const { protect } = require('../middleware/authMiddleware')
 
+router.post('/login', UserCtrl.loginForUser)
+
 /* NOTE: 100% automatic */
 router.route('/documents')
     .get(protect, UserCtrl.getDocumentsByUser)

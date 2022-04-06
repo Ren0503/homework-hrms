@@ -3,7 +3,7 @@ const router = express.Router()
 
 const DocCtrl = require('../controllers/documentControllers')
 const { protect, admin } = require('../middleware/authMiddleware')
-const { uploadFile } = require('../utils/files')
+const { uploadFile } = require('../utils/fileHandlers')
 
 /* NOTE: 100% automatic */
 router.route('/')

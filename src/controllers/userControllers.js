@@ -1,12 +1,43 @@
 const asyncHandler = require('express-async-handler')
 const Confirm = require('../models/confirmModel')
 const Document = require('../models/documentModel')
+const User = require('../models/userModel')
+const googleAuth = require('../utils/googleAuth')
+const generateToken = require('../utils/generateToken')
+
+// @desc    Login for user
+// @route   POST /api/admin/login
+// @access  Public
+exports.loginForUser = asyncHandler(async (req, res) => {
+    const tokenId = req.body.tokenId
+    const profile = await googleAuth.getProfileInfo(tokenId)
+
+    let user = await User.findOne({ socialId: profile.sub })
+
+    if (!user) {
+        const newUser = {
+            socialId: profile.sub,
+            name: profile.name,
+            avatar: profile.picture,
+        }
+
+        user = await User.create(newUser)
+    }
+
+    res.json({
+        _id: user._id,
+        name: user.name,
+        avatar: user.avatar,
+        role: user.role,
+        token: generateToken(user._id),
+    })
+})
 
 // @desc    Fetch all documents
 // @route   GET /api/user/documents
 // @access  Private
 exports.getDocumentsByUser = asyncHandler(async (req, res) => {
-    const pageSize = 12
+    const pageSize = 10
     const page = Number(req.query.pageNumber) || 1
 
     const docConfirms = []

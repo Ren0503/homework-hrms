@@ -1,7 +1,7 @@
 const asyncHandler = require('express-async-handler')
 const Document = require('../models/documentModel')
 const Confirm = require('../models/confirmModel')
-const { deleteFile } = require('../utils/files')
+const { deleteFile } = require('../utils/fileHandlers')
 
 // @desc    Fetch all documents
 // @route   GET /api/admin/documents
@@ -56,6 +56,7 @@ exports.updateDocument = asyncHandler(async (req, res) => {
     if (document) {
         deleteFile(document.url)
 
+        document.title = req.file.filename,
         document.url = req.file.path
         const updatedDocument = await document.save()
         res.json(updatedDocument)
