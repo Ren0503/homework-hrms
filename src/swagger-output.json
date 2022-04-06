@@ -296,7 +296,7 @@
                 }
             }
         },
-        "api/userlogin": {
+        "api/user/login": {
             "post": {
                 "tags": [
                     "User"
@@ -323,7 +323,66 @@
                 }
             }
         },
-        "api/user/document/{id}/confirm": {
+        "api/user/documents": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "Get assigned documents",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "pageNumber",
+                        "in": "query",
+                        "type": "number"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Document"
+                        },
+                        "description": "Documents found."
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "api/user/documents/{id}": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "Get document by id",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Document"
+                        },
+                        "description": "Documents found."
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "api/user/documents/{id}/confirm": {
             "get": {
                 "tags": [
                     "User"
