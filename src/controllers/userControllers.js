@@ -42,7 +42,7 @@ exports.getDocumentsByUser = asyncHandler(async (req, res) => {
 
     const docConfirms = []
     const query = {
-        user: req.user._id
+        userId: req.user._id
     }
 
     const count = await Confirm.countDocuments(query)
@@ -50,13 +50,13 @@ exports.getDocumentsByUser = asyncHandler(async (req, res) => {
     const confirm = await Confirm.find(query)
         .limit(pageSize)
         .skip(pageSize * (page - 1))
-        .populate('document')
+        .populate('docId')
 
     confirm.map((c) => (docConfirms.push({
-        "_id": c.document._id, 
+        "_id": c.docId._id, 
         "status": c.status, 
-        "title": c.document.title, 
-        "url": c.document.url,
+        "title": c.docId.title, 
+        "url": c.docId.url,
         "assigned": c.createdAt
     })))
 
@@ -70,7 +70,7 @@ exports.readingDocument = asyncHandler(async (req, res) => {
     const document = await Document.findById(req.params.id)
 
     if (document) {
-        const confirm = await Confirm.findOne({ $and: [{ document: document._id }, { user: req.user._id }] })
+        const confirm = await Confirm.findOne({ $and: [{ docId: document._id }, { userId: req.user._id }] })
 
         if (confirm) {
             confirm.status = "Reading"
@@ -94,7 +94,7 @@ exports.confirmDocument = asyncHandler(async (req, res) => {
     const document = await Document.findById(req.params.id)
 
     if (document) {
-        const confirm = await Confirm.findOne({ $and: [{ document: document._id }, { user: req.user._id }] })
+        const confirm = await Confirm.findOne({ $and: [{ docId: document._id }, { userId: req.user._id }] })
 
         if (confirm) {
             confirm.status = "Completed"

@@ -12,7 +12,7 @@ router.route('/')
 
 /* NOTE: 100% automatic */
 router.route('/:id')
-    .get(protect, admin, DocCtrl.getDocumentById)
+    .get(protect, DocCtrl.getDocumentById)
     .put(protect, admin, uploadFile.single('file'), DocCtrl.updateDocument)
     .delete(protect, admin, DocCtrl.deleteDocument)
 

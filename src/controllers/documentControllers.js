@@ -1,6 +1,8 @@
 const asyncHandler = require('express-async-handler')
+
 const Document = require('../models/documentModel')
 const Confirm = require('../models/confirmModel')
+
 const { deleteFile } = require('../utils/fileHandlers')
 
 // @desc    Fetch all documents
@@ -9,24 +11,42 @@ const { deleteFile } = require('../utils/fileHandlers')
 exports.getDocumentsByAdmin = asyncHandler(async (req, res) => {
     const pageSize = 12
     const page = Number(req.query.pageNumber) || 1
-
     const query = { deleted: false }
+
     const count = await Document.countDocuments(query)
+
     const documents = await Document.find(query)
         .limit(pageSize)
         .skip(pageSize * (page - 1))
 
+
     res.json({ documents, page, pages: Math.ceil(count / pageSize), count })
+
 })
 
 // @desc    Fetch single document
 // @route   GET /api/admin/documents/:id
-// @access  Private/Admin
+// @access  Private
 exports.getDocumentById = asyncHandler(async (req, res) => {
     const document = await Document.findById(req.params.id)
 
     if (document) {
-        res.json(document)
+
+        if (req.user.role !== 9) {
+            const confirm = await Confirm.findOne({ $and: [{ docId: document._id }, { userId: req.user._id }] })
+
+            if (confirm) {
+                confirm.status = "Reading"
+                await confirm.save()
+
+                res.json(document)
+            } else {
+                res.status(401)
+                throw new Error('Not authorized, need admin assigned')
+            }
+        } else {
+            res.json(document)
+        }
     } else {
         res.status(404)
         throw new Error('Document not found')
@@ -56,7 +76,7 @@ exports.updateDocument = asyncHandler(async (req, res) => {
     if (document) {
         deleteFile(document.url)
 
-        document.title = req.file.filename,
+        document.title = req.file.filename
         document.url = req.file.path
         const updatedDocument = await document.save()
         res.json(updatedDocument)

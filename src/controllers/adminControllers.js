@@ -71,11 +71,10 @@ exports.getListUsersForDocument = asyncHandler(async (req, res) => {
     let query = { role: { $ne: 9 } };
 
     if (document) {
-        const confirms = await Confirm.find({ document: req.params.id })
+        const confirms = await Confirm.find({ docId: req.params.id })
 
         if (confirms) {
-            confirms.map((c) => (userConfirms.push(c.user)))
-            console.log(userConfirms)
+            confirms.map((c) => (userConfirms.push(c.userId)))
 
             query = { _id: { $nin: userConfirms }, role: { $ne: 9 } }
         }
@@ -96,10 +95,29 @@ exports.assignUserForDocument = asyncHandler(async (req, res) => {
     const document = await Document.findById(req.params.id)
 
     if (document) {
-        const [...users] = req.body.userIds
+        let users = []
+        const userExits = []
+        const confirmsExit = await Confirm.find({ docId: req.params.id })
+        const [...userAssign] = req.body.userIds
 
-        users.forEach(function (ele) {
-            ele.docId = req.params.id
+        if (confirmsExit) {
+            confirmsExit.map((c) => (userExits.push(c.userId)))
+
+            if (JSON.stringify(userAssign)==JSON.stringify(userExits)) {
+                res.status(402)
+                throw new Error('All users you send are assigned')
+            }
+        }
+
+        userAssign.forEach((element) => {
+            if (!userExits.includes(element)) {
+                users.push(
+                    {
+                        "userId": element,
+                        "docId": req.params.id
+                    }
+                )
+            }
         })
 
         const confirms = await Confirm.insertMany(users);

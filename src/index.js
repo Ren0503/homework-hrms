@@ -4,15 +4,11 @@ const express = require('express')
 const mongoose = require('mongoose')
 const dotenv = require('dotenv')
 const morgan = require('morgan')
-const session = require('express-session')
-const passport = require('passport')
 const swaggerUi = require('swagger-ui-express')
 const swaggerFile = require('./swagger-output.json')
 const { notFound, errorHandler } = require('./middleware/errorMiddleware')
 
 dotenv.config()
-
-require('./config/passport')(passport)
 
 const connectDB = require('./config/db')
 connectDB()
@@ -37,19 +33,6 @@ if (process.env.NODE_ENV === 'development') {
 
 // Swagger UI
 app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
-
-// Sessions
-app.use(
-    session({
-        secret: 'keyboard',
-        resave: false,
-        saveUninitialized: false,
-    })
-)
-
-// Passport middleware
-app.use(passport.initialize())
-app.use(passport.session())
 
 // Routes
 const router = require("./routes/index");
