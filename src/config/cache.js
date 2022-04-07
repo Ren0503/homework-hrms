@@ -1,5 +1,5 @@
 const { createClient } = require("redis");
-let redisClient = createClient({ legacyMode: true });
+let redisClient = createClient({ url: process.env.REDIS_URL, legacyMode: true });
 const { promisify } = require('util');
 
 redisClient.connect().catch(console.error)
