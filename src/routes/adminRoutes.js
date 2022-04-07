@@ -3,12 +3,10 @@ const router = express.Router()
 
 const AdminCtrl = require('../controllers/adminControllers')
 const { protect, admin } = require('../middleware/authMiddleware')
+const { blocking } = require('../middleware/limitMiddleware')
 
 /* NOTE: 100% automatic */
-router.post('/login', AdminCtrl.loginForAdmin)
-
-/* NOTE: 100% automatic */
-router.post('/register', AdminCtrl.registerUser)
+router.post('/login', blocking, AdminCtrl.loginForAdmin)
 
 /* NOTE: 100% automatic */
 router.route('/documents/:id/users')

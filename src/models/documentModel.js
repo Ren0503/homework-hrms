@@ -22,6 +22,9 @@ const documentSchema = new mongoose.Schema({
     timestamps: true,
 })
 
-documentSchema.plugin(mongoose_delete)
+documentSchema.plugin(mongoose_delete,  {
+    deletedAt: true,
+    overrideMethods: 'all',
+})
 
 module.exports = mongoose.model('Document', documentSchema)

@@ -37,7 +37,7 @@ exports.loginForUser = asyncHandler(async (req, res) => {
 // @route   GET /api/user/documents
 // @access  Private
 exports.getDocumentsByUser = asyncHandler(async (req, res) => {
-    const pageSize = 10
+    const pageSize = 5
     const page = Number(req.query.pageNumber) || 1
 
     const docConfirms = []
@@ -61,30 +61,6 @@ exports.getDocumentsByUser = asyncHandler(async (req, res) => {
     })))
 
     res.json({ documents: docConfirms, page, pages: Math.ceil(count / pageSize), count })
-})
-
-// @desc    Read documents
-// @route   GET /api/user/documents/:id
-// @access  Private
-exports.readingDocument = asyncHandler(async (req, res) => {
-    const document = await Document.findById(req.params.id)
-
-    if (document) {
-        const confirm = await Confirm.findOne({ $and: [{ docId: document._id }, { userId: req.user._id }] })
-
-        if (confirm) {
-            confirm.status = "Reading"
-            await confirm.save()
-
-            res.json(document)
-        } else {
-            res.status(401)
-            throw new Error('Not authorized, need admin assigned')
-        }
-    } else {
-        res.status(404)
-        throw new Error('Not found doc')
-    }
 })
 
 // @desc    Confirm documents

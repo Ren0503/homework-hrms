@@ -14,8 +14,4 @@ router.route('/documents')
 router.route('/documents/:id/confirm')
     .get(protect, UserCtrl.confirmDocument)
 
-/* NOTE: 100% automatic */
-router.route('/documents/:id')
-    .get(protect, UserCtrl.readingDocument)
-
 module.exports = router

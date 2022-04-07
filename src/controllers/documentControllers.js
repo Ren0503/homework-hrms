@@ -9,7 +9,7 @@ const { deleteFile } = require('../utils/fileHandlers')
 // @route   GET /api/admin/documents
 // @access  Private/Admin
 exports.getDocumentsByAdmin = asyncHandler(async (req, res) => {
-    const pageSize = 12
+    const pageSize = 5
     const page = Number(req.query.pageNumber) || 1
     const query = { deleted: false }
 
@@ -36,8 +36,10 @@ exports.getDocumentById = asyncHandler(async (req, res) => {
             const confirm = await Confirm.findOne({ $and: [{ docId: document._id }, { userId: req.user._id }] })
 
             if (confirm) {
-                confirm.status = "Reading"
-                await confirm.save()
+                if (confirm.status !== "Completed") {
+                    confirm.status = "Reading"
+                    await confirm.save()
+                }
 
                 res.json(document)
             } else {
@@ -58,7 +60,7 @@ exports.getDocumentById = asyncHandler(async (req, res) => {
 // @access  Private/Admin
 exports.createDocument = asyncHandler(async (req, res) => {
     const document = new Document({
-        title: req.file.filename,
+        title: req.file.originalname,
         postedBy: req.user.id,
         url: req.file.path,
     })
@@ -76,9 +78,11 @@ exports.updateDocument = asyncHandler(async (req, res) => {
     if (document) {
         deleteFile(document.url)
 
-        document.title = req.file.filename
+        document.title = req.file.originalname
         document.url = req.file.path
+
         const updatedDocument = await document.save()
+        await Confirm.updateMany({ docId: document._id }, { status: "Open" })
         res.json(updatedDocument)
     } else {
         res.status(404)
@@ -93,13 +97,27 @@ exports.deleteDocument = asyncHandler(async (req, res) => {
     const document = await Document.findById(req.params.id)
 
     if (document) {
-        deleteFile(document.url)
+        await Confirm.delete({ docId: document._id })
 
-        await Confirm.remove({ document: document._id })
-
-        await document.remove()
+        await Document.delete({ _id: req.params.id })
 
         res.json({ message: 'Doc removed' })
+    } else {
+        res.status(404)
+        throw new Error('Doc not found')
+    }
+})
+
+// @desc    Restore a document
+// @route   PATCH /api/admin/documents/:id
+// @access  Private/Admin
+exports.restoreDocument = asyncHandler(async (req, res) => {
+    const document = await Document.restore({ _id: req.params.id})
+
+    if (document) {
+        await Confirm.restore({ docId: req.params.id })
+
+        res.json({ message: 'Doc restored' })
     } else {
         res.status(404)
         throw new Error('Doc not found')

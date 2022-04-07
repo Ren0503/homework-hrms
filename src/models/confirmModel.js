@@ -21,6 +21,9 @@ const confirmSchema = new mongoose.Schema({
     timestamps: true,
 })
 
-confirmSchema.plugin(mongoose_delete)
+confirmSchema.plugin(mongoose_delete,  {
+    deletedAt: true,
+    overrideMethods: 'all',
+})
 
 module.exports = mongoose.model('Confirm', confirmSchema)

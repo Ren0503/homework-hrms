@@ -2,11 +2,13 @@ const path = require('path')
 const cors = require('cors')
 const express = require('express')
 const mongoose = require('mongoose')
+const helmet = require('helmet')
 const dotenv = require('dotenv')
 const morgan = require('morgan')
 const swaggerUi = require('swagger-ui-express')
 const swaggerFile = require('./swagger-output.json')
 const { notFound, errorHandler } = require('./middleware/errorMiddleware')
+const { logger } = require('./config/logging')
 
 dotenv.config()
 
@@ -22,12 +24,23 @@ const app = express()
 // }
 app.use(cors())
 
+// Helmet
+// 
+app.use(helmet())
+
 // Body parser
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
 // Logging
 if (process.env.NODE_ENV === 'development') {
+    logger.stream = {
+        write: function (message, encoding) {
+            logger.info(message);
+        }
+    };
+
+    app.use(morgan("combined", { "stream": logger.stream }));
     app.use(morgan('dev'))
 }
 

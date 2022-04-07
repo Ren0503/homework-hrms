@@ -25,7 +25,10 @@ const userSchema = new mongoose.Schema({
     timestamps: true,
 })
 
-userSchema.plugin(mongoose_delete)
+userSchema.plugin(mongoose_delete,  {
+    deletedAt: true,
+    overrideMethods: 'all',
+})
 
 userSchema.methods.matchPassword = async function(enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password)

@@ -1,7 +1,10 @@
 const asyncHandler = require('express-async-handler')
+
 const Document = require('../models/documentModel')
 const Confirm = require('../models/confirmModel')
 const User = require('../models/userModel')
+
+const cache = require('../config/cache')
 const generateToken = require('../utils/generateToken')
 
 // @desc    Login for admin
@@ -9,11 +12,15 @@ const generateToken = require('../utils/generateToken')
 // @access  Public
 exports.loginForAdmin = asyncHandler(async (req, res) => {
     const { name, password } = req.body
+    let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
 
+    const data = await cache.get(ip)
     const user = await User.findOne({ name })
 
     if (user && (await user.matchPassword(password))) {
         if (user.role !== 9) {
+            await cache.save(ip, 60, data + 1)
+
             res.status(401)
             throw new Error('Not authorized as an admin')
         }
@@ -27,40 +34,12 @@ exports.loginForAdmin = asyncHandler(async (req, res) => {
             })
         }
     } else {
+        await cache.save(ip, 60, data + 1)
+
         res.status(401)
         throw new Error('Invalid name or password')
     }
 })
-
-// For test
-exports.registerUser = asyncHandler(async (req, res) => {
-    const { name, password } = req.body
-
-    const userExists = await User.findOne({ name })
-
-    if (userExists) {
-        res.status(400)
-        throw new Error('User already exists')
-    }
-
-    const user = await User.create({
-        name,
-        password,
-        role: 9,
-    })
-
-    if (user) {
-        res.status(201).json({
-            _id: user._id,
-            name: user.name,
-            token: generateToken(user._id),
-        })
-    } else {
-        res.status(400)
-        throw new Error('Invalid user data')
-    }
-})
-
 
 // @desc    Get list of user
 // @route   GET /api/admin/documents/:id/users
@@ -76,7 +55,7 @@ exports.getListUsersForDocument = asyncHandler(async (req, res) => {
         if (confirms) {
             confirms.map((c) => (userConfirms.push(c.userId)))
 
-            query = { _id: { $nin: userConfirms }, role: { $ne: 9 } }
+            query._id = { $nin: userConfirms }
         }
 
         const users = await User.find(query)
@@ -95,23 +74,28 @@ exports.assignUserForDocument = asyncHandler(async (req, res) => {
     const document = await Document.findById(req.params.id)
 
     if (document) {
-        let users = []
-        const userExits = []
-        const confirmsExit = await Confirm.find({ docId: req.params.id })
+        let confirms = []
+        
+        // Get list users from body
         const [...userAssign] = req.body.userIds
 
-        if (confirmsExit) {
-            confirmsExit.map((c) => (userExits.push(c.userId)))
+        // Check user have assigned
+        const userExits = []
+        const confirmsExit = await Confirm.find({ docId: req.params.id })
 
-            if (JSON.stringify(userAssign)==JSON.stringify(userExits)) {
+        if (confirmsExit) {
+            confirmsExit.map((c) => (userExits.push(c.userId.toString())))
+
+            if (JSON.stringify(userAssign) == JSON.stringify(userExits)) {
                 res.status(402)
                 throw new Error('All users you send are assigned')
             }
         }
 
+        // Create list confirms
         userAssign.forEach((element) => {
             if (!userExits.includes(element)) {
-                users.push(
+                confirms.push(
                     {
                         "userId": element,
                         "docId": req.params.id
@@ -120,9 +104,9 @@ exports.assignUserForDocument = asyncHandler(async (req, res) => {
             }
         })
 
-        const confirms = await Confirm.insertMany(users);
+        const createdConfirms = await Confirm.insertMany(confirms);
 
-        res.json(confirms);
+        res.json(createdConfirms);
     } else {
         res.status(404)
         throw new Error('Document not found')

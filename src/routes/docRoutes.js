@@ -14,6 +14,7 @@ router.route('/')
 router.route('/:id')
     .get(protect, DocCtrl.getDocumentById)
     .put(protect, admin, uploadFile.single('file'), DocCtrl.updateDocument)
+    .patch(protect, admin, DocCtrl.restoreDocument)
     .delete(protect, admin, DocCtrl.deleteDocument)
 
 module.exports = router
