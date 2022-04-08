@@ -1,4 +1,5 @@
 const asyncHandler = require('express-async-handler')
+const { body, validationResult } = require('express-validator')
 
 const Document = require('../models/documentModel')
 const Confirm = require('../models/confirmModel')
@@ -11,6 +12,13 @@ const generateToken = require('../utils/generateToken')
 // @route   POST /api/admin/login
 // @access  Public
 exports.loginForAdmin = asyncHandler(async (req, res) => {
+    const result = validationResult(req)
+
+    if (!result.isEmpty()) {
+        const errors = result.array({ onlyFirstError: true })
+        return res.status(422).json({ errors })
+    }
+
     const { name, password } = req.body
     let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
 
@@ -47,7 +55,7 @@ exports.loginForAdmin = asyncHandler(async (req, res) => {
 exports.getListUsersForDocument = asyncHandler(async (req, res) => {
     const document = await Document.findById(req.params.id)
     const userConfirms = []
-    let query = { role: { $ne: 9 } };
+    let query = { role: { $ne: 9 } }
 
     if (document) {
         const confirms = await Confirm.find({ docId: req.params.id })
@@ -71,11 +79,18 @@ exports.getListUsersForDocument = asyncHandler(async (req, res) => {
 // @route   POST /api/admin/documents/:id/assign
 // @access  Private/Admin
 exports.assignUserForDocument = asyncHandler(async (req, res) => {
+    const result = validationResult(req)
+
+    if (!result.isEmpty()) {
+        const errors = result.array({ onlyFirstError: true })
+        return res.status(422).json({ errors })
+    }
+
     const document = await Document.findById(req.params.id)
 
     if (document) {
         let confirms = []
-        
+
         // Get list users from body
         const [...userAssign] = req.body.userIds
 
@@ -104,11 +119,32 @@ exports.assignUserForDocument = asyncHandler(async (req, res) => {
             }
         })
 
-        const createdConfirms = await Confirm.insertMany(confirms);
+        const createdConfirms = await Confirm.insertMany(confirms)
 
-        res.json(createdConfirms);
+        res.json(createdConfirms)
     } else {
         res.status(404)
         throw new Error('Document not found')
     }
 })
+
+exports.loginAdminValidate = [
+    body('name')
+        .exists()
+        .trim()
+        .withMessage('is required')
+
+        .notEmpty()
+        .withMessage('cannot be blank'),
+    body('password')
+        .exists()
+        .trim()
+        .withMessage('is required')
+
+        .notEmpty()
+        .withMessage('cannot be blank')
+]
+
+exports.assignUserValidate = [
+    body('userIds').exists().withMessage('is required')
+]

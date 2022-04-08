@@ -25,7 +25,6 @@ const app = express()
 app.use(cors())
 
 // Helmet
-// 
 app.use(helmet())
 
 // Body parser
@@ -36,11 +35,11 @@ app.use(express.json())
 if (process.env.NODE_ENV === 'development') {
     logger.stream = {
         write: function (message, encoding) {
-            logger.info(message);
+            logger.info(message)
         }
-    };
+    }
 
-    app.use(morgan("combined", { "stream": logger.stream }));
+    app.use(morgan("combined", { "stream": logger.stream }))
     app.use(morgan('dev'))
 }
 
@@ -48,8 +47,8 @@ if (process.env.NODE_ENV === 'development') {
 app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 
 // Routes
-const router = require("./routes/index");
-app.use(router);
+const router = require("./routes/index")
+app.use(router)
 
 __dirname = path.resolve()
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')))

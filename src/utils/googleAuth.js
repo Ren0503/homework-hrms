@@ -1,4 +1,4 @@
-const { OAuth2Client } = require('google-auth-library');
+const { OAuth2Client } = require('google-auth-library')
 
 const client = new OAuth2Client(
     process.env.GOOGLE_CLIENT_ID,
@@ -9,15 +9,15 @@ const client = new OAuth2Client(
      * postmessage is magic value for redirect_uri to get credentials without actual redirect uri.
      */
     'postmessage'
-);
+)
 
 exports.getProfileInfo = async (idToken) => {
     const ticket = await client.verifyIdToken({
         idToken,
         audience: process.env.GOOGLE_CLIENT_ID,
-    });
+    })
 
-    const payload = ticket.getPayload();
+    const payload = ticket.getPayload()
 
-    return payload;
-};
+    return payload
+}

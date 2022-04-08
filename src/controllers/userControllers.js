@@ -1,7 +1,10 @@
 const asyncHandler = require('express-async-handler')
+const { body, validationResult } = require('express-validator')
+
 const Confirm = require('../models/confirmModel')
 const Document = require('../models/documentModel')
 const User = require('../models/userModel')
+
 const googleAuth = require('../utils/googleAuth')
 const generateToken = require('../utils/generateToken')
 
@@ -9,6 +12,13 @@ const generateToken = require('../utils/generateToken')
 // @route   POST /api/admin/login
 // @access  Public
 exports.loginForUser = asyncHandler(async (req, res) => {
+    const result = validationResult(req)
+
+    if (!result.isEmpty()) {
+        const errors = result.array({ onlyFirstError: true })
+        return res.status(422).json({ errors })
+    }
+
     const tokenId = req.body.tokenId
     const profile = await googleAuth.getProfileInfo(tokenId)
 
@@ -86,3 +96,13 @@ exports.confirmDocument = asyncHandler(async (req, res) => {
         throw new Error('Not found doc')
     }
 })
+
+exports.loginUserValidate = [
+    body('tokenId')
+        .exists()
+        .trim()
+        .withMessage('is required')
+
+        .notEmpty()
+        .withMessage('cannot be blank'),
+]
