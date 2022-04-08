@@ -9,7 +9,7 @@ const { deleteFile } = require('../utils/fileHandlers')
 // @route   GET /api/document
 // @access  Private/Admin
 exports.getDocumentsByAdmin = asyncHandler(async (req, res) => {
-    const pageSize = 5
+    const pageSize = 4
     const page = Number(req.query.pageNumber) || 1
     const sort = req.query.sort || '-createdAt';
 
