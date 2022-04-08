@@ -12,6 +12,7 @@ const generateToken = require('../utils/generateToken')
 // @route   POST /api/admin/login
 // @access  Public
 exports.loginForAdmin = asyncHandler(async (req, res) => {
+    // Validate body
     const result = validationResult(req)
 
     if (!result.isEmpty()) {
@@ -20,14 +21,20 @@ exports.loginForAdmin = asyncHandler(async (req, res) => {
     }
 
     const { name, password } = req.body
+
+    // Check ip have many login failed
     let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
 
-    const data = await cache.get(ip)
+    let data = await cache.get(ip)
+    if (!data)
+        data = 0
+
     const user = await User.findOne({ name })
 
     if (user && (await user.matchPassword(password))) {
         if (user.role !== 9) {
-            await cache.save(ip, 60, data + 1)
+            // Track login failed by ip
+            await cache.save(ip, data + 1, 60)
 
             res.status(401)
             throw new Error('Not authorized as an admin')
@@ -42,7 +49,8 @@ exports.loginForAdmin = asyncHandler(async (req, res) => {
             })
         }
     } else {
-        await cache.save(ip, 60, data + 1)
+        // Track login failed by ip
+        await cache.save(ip, data + 1, 60)
 
         res.status(401)
         throw new Error('Invalid name or password')
@@ -79,6 +87,7 @@ exports.getListUsersForDocument = asyncHandler(async (req, res) => {
 // @route   POST /api/admin/documents/:id/assign
 // @access  Private/Admin
 exports.assignUserForDocument = asyncHandler(async (req, res) => {
+    // Validate body
     const result = validationResult(req)
 
     if (!result.isEmpty()) {
@@ -94,7 +103,7 @@ exports.assignUserForDocument = asyncHandler(async (req, res) => {
         // Get list users from body
         const [...userAssign] = req.body.userIds
 
-        // Check user have assigned
+        // Check user have assigned yet
         const userExits = []
         const confirmsExit = await Confirm.find({ docId: req.params.id })
 

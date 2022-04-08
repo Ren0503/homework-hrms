@@ -10,6 +10,9 @@ router.route('/')
     .get(protect, admin, DocCtrl.getDocumentsByAdmin)
     .post(protect, admin, uploadFile.single('file'), DocCtrl.createDocument)
 
+router.route('/deleted')
+    .get(protect, admin, DocCtrl.getDeletedDocumentsByAdmin)
+
 /* NOTE: 100% automatic */
 router.route('/:id')
     .get(protect, DocCtrl.getDocumentById)

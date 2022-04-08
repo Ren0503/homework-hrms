@@ -52,7 +52,8 @@ exports.getDocumentsByUser = asyncHandler(async (req, res) => {
 
     const docConfirms = []
     const query = {
-        userId: req.user._id
+        userId: req.user._id,
+        deleted: false
     }
 
     const count = await Confirm.countDocuments(query)

@@ -270,6 +270,31 @@
                     }
                 }
             },
+            "patch": {
+                "tags": [
+                    "Document"
+                ],
+                "description": "Restore document by id",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Restore success"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
             "delete": {
                 "tags": [
                     "Document"
@@ -292,6 +317,39 @@
                     },
                     "404": {
                         "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/api/document/deleted": {
+            "get": {
+                "tags": [
+                    "Document"
+                ],
+                "description": "Get list deleted documents.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "pageNumber",
+                        "in": "query",
+                        "description": "Page for pagination.",
+                        "type": "number"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/Document"
+                        },
+                        "description": "Documents found."
+                    },
+                    "500": {
+                        "description": "Server Failure."
                     }
                 }
             }

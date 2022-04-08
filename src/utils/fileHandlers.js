@@ -16,10 +16,10 @@ const storage = multer.diskStorage({
 })
 
 function checkFileType(file, cb) {
-    const filetypes = /pdf|msword|x-pdf/
-    const mimetype = filetypes.test(file.mimetype)
+    const filetypes = /pdf|doc|docx/
+    const extname = filetypes.test(path.extname(file.originalname).toLocaleLowerCase())
 
-    if (mimetype) {
+    if (extname) {
         return cb(null, true)
     } else {
         cb('Doc only!')
