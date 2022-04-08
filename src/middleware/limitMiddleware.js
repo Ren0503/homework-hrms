@@ -9,7 +9,8 @@ exports.blockIP = asyncHandler(async (req, res, next) => {
 
     if (data && data > 4) {
         res.set('Retry-After', String(60))
-        res.status(429).json('Too Many Requests')
+        res.status(429)
+        throw new Error('Too Many Requests')
     } else {
         next()
     }
