@@ -36,7 +36,7 @@ exports.loginForAdmin = asyncHandler(async (req, res) => {
             // Track login failed by ip
             await cache.save(ip, data + 1, 60)
 
-            res.status(401)
+            res.status(403)
             throw new Error('Not authorized as an admin')
         }
         else {
@@ -111,7 +111,7 @@ exports.assignUserForDocument = asyncHandler(async (req, res) => {
             confirmsExit.map((c) => (userExits.push(c.userId.toString())))
 
             if (JSON.stringify(userAssign) == JSON.stringify(userExits)) {
-                res.status(402)
+                res.status(400)
                 throw new Error('All users you send are assigned')
             }
         }

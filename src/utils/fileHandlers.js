@@ -1,6 +1,7 @@
 const path = require('path')
 const multer = require('multer')
 const fs = require('fs')
+const { logger } = require('../config/logging')
 
 // For upload file
 const storage = multer.diskStorage({
@@ -23,7 +24,7 @@ function checkFileType(file, cb) {
     if (extname) {
         return cb(null, true)
     } else {
-        cb('Doc only!')
+        cb(new Error('Invalid file type'))
     }
 }
 
@@ -44,13 +45,9 @@ const deleteFile = (url) => {
 
     if (exitFile) {
         fs.unlinkSync(url)
-        console.log({
-            status: "200",
-            responseType: "string",
-            response: "success"
-        })
+        logger.info('Delete success')
     } else {
-        console.log('Not found file')
+        logger.error('Not found file')
     }
 }
 

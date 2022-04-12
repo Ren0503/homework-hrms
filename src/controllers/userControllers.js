@@ -89,7 +89,7 @@ exports.confirmDocument = asyncHandler(async (req, res) => {
 
             res.status(200).json("Confirm success")
         } else {
-            res.status(401)
+            res.status(403)
             throw new Error('Not authorized, need admin assigned')
         }
     } else {

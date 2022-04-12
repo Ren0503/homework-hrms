@@ -9,7 +9,7 @@ const { deleteFile } = require('../utils/fileHandlers')
 // @route   GET /api/document
 // @access  Private/Admin
 exports.getDocumentsByAdmin = asyncHandler(async (req, res) => {
-    const pageSize = 4
+    const pageSize = Number(req.query.perPage) ||4
     const page = Number(req.query.pageNumber) || 1
     const sort = req.query.sort || '-createdAt'
 
@@ -50,7 +50,7 @@ exports.getDocumentById = asyncHandler(async (req, res) => {
 
                 res.json(document)
             } else {
-                res.status(401)
+                res.status(403)
                 throw new Error('Not authorized, need admin assigned')
             }
         } else {
@@ -66,8 +66,14 @@ exports.getDocumentById = asyncHandler(async (req, res) => {
 // @route   POST /api/document
 // @access  Private/Admin
 exports.createDocument = asyncHandler(async (req, res) => {
+    if (!req.file) {
+        res.status(400)
+        throw new Error("Need file in input")
+    }
+
     if (typeof req.fileSizeError != "undefined") {
-        res.json({ "error": "File too large" })    // to display filesize error
+        res.status(400)
+        throw new Error("File too large")
     }
 
     const document = new Document({
@@ -91,7 +97,8 @@ exports.updateDocument = asyncHandler(async (req, res) => {
         deleteFile(document.url)
 
         if (typeof req.fileSizeError != "undefined") {
-            res.json({ "error": "File too large" })    // to display filesize error
+            res.status(400)
+            throw new Error("File too large")
         }
         
         document.title = req.file.originalname
