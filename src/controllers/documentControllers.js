@@ -11,7 +11,7 @@ const { deleteFile } = require('../utils/fileHandlers')
 exports.getDocumentsByAdmin = asyncHandler(async (req, res) => {
     const pageSize = 4
     const page = Number(req.query.pageNumber) || 1
-    const sort = req.query.sort || '-createdAt';
+    const sort = req.query.sort || '-createdAt'
 
     const query = { deleted: false }
 
@@ -66,6 +66,10 @@ exports.getDocumentById = asyncHandler(async (req, res) => {
 // @route   POST /api/document
 // @access  Private/Admin
 exports.createDocument = asyncHandler(async (req, res) => {
+    if (typeof req.fileSizeError != "undefined") {
+        res.json({ "error": "File too large" })    // to display filesize error
+    }
+
     const document = new Document({
         title: req.file.originalname,
         postedBy: req.user.id,
@@ -83,8 +87,13 @@ exports.updateDocument = asyncHandler(async (req, res) => {
     const document = await Document.findById(req.params.id)
 
     if (document) {
+        // delete old file
         deleteFile(document.url)
 
+        if (typeof req.fileSizeError != "undefined") {
+            res.json({ "error": "File too large" })    // to display filesize error
+        }
+        
         document.title = req.file.originalname
         document.url = req.file.path
 
@@ -121,7 +130,7 @@ exports.deleteDocument = asyncHandler(async (req, res) => {
 exports.getDeletedDocumentsByAdmin = asyncHandler(async (req, res) => {
     const pageSize = 5
     const page = Number(req.query.pageNumber) || 1
-    const sort = req.query.sort || '-createdAt';
+    const sort = req.query.sort || '-createdAt'
 
     const query = { deleted: true }
 
