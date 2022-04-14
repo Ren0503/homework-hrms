@@ -5,14 +5,14 @@ const AdminCtrl = require('../controllers/adminControllers')
 const { protect, admin } = require('../middleware/authMiddleware')
 const { blockIP } = require('../middleware/limitMiddleware')
 
-/* NOTE: 100% automatic */
+/* NOTE: Completing informations automaticaly obtaineds */
 router.post('/login', blockIP, AdminCtrl.loginAdminValidate, AdminCtrl.loginForAdmin)
 
-/* NOTE: 100% automatic */
+/* NOTE: Completing informations automaticaly obtaineds */
 router.route('/documents/:id/users')
     .get(protect, admin, AdminCtrl.getListUsersForDocument)
 
-/* NOTE: 100% automatic */
+/* NOTE: Completing informations automaticaly obtaineds */
 router.route('/documents/:id/assign')
     .post(protect, admin, AdminCtrl.assignUserValidate, AdminCtrl.assignUserForDocument)
 

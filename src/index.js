@@ -6,7 +6,7 @@ const helmet = require('helmet')
 const dotenv = require('dotenv')
 const morgan = require('morgan')
 const swaggerUi = require('swagger-ui-express')
-const swaggerFile = require('./swagger-output.json')
+const swaggerFile = require('../swagger_output.json')
 const { notFound, errorHandler } = require('./middleware/errorMiddleware')
 const { logger } = require('./config/logging')
 
@@ -25,7 +25,16 @@ const app = express()
 app.use(cors())
 
 // Helmet
-app.use(helmet())
+app.use(
+    helmet({
+        contentSecurityPolicy: {
+            directives: {
+                ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+                "script-src": ["'self'", "'unsafe-inline'", "localhost"],
+            },
+        },
+    })
+);
 
 // Body parser
 app.use(express.urlencoded({ extended: false }))

@@ -40,6 +40,8 @@ exports.loginForAdmin = asyncHandler(async (req, res) => {
             throw new Error('Not authorized as an admin')
         }
         else {
+            /*  #swagger.tags = ['Admin']
+    #swagger.description = 'Endpoint to get the specific admin.' */
             res.json({
                 _id: user._id,
                 name: user.name,
@@ -76,6 +78,8 @@ exports.getListUsersForDocument = asyncHandler(async (req, res) => {
 
         const users = await User.find(query)
 
+        /*  #swagger.tags = ['Admin']
+#swagger.description = 'Endpoint to get the specific admin.' */
         res.json(users)
     } else {
         res.status(404)
@@ -130,6 +134,8 @@ exports.assignUserForDocument = asyncHandler(async (req, res) => {
 
         const createdConfirms = await Confirm.insertMany(confirms)
 
+        /*  #swagger.tags = ['Admin']
+#swagger.description = 'Endpoint to get the specific admin.' */
         res.json(createdConfirms)
     } else {
         res.status(404)

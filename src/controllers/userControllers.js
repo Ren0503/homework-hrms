@@ -34,6 +34,8 @@ exports.loginForUser = asyncHandler(async (req, res) => {
         user = await User.create(newUser)
     }
 
+    /*  #swagger.tags = ['User']
+    #swagger.description = 'Endpoint to get the specific user.' */
     res.json({
         _id: user._id,
         name: user.name,
@@ -64,13 +66,15 @@ exports.getDocumentsByUser = asyncHandler(async (req, res) => {
         .populate('docId')
 
     confirm.map((c) => (docConfirms.push({
-        "_id": c.docId._id, 
-        "status": c.status, 
-        "title": c.docId.title, 
+        "_id": c.docId._id,
+        "status": c.status,
+        "title": c.docId.title,
         "url": c.docId.url,
         "assigned": c.createdAt
     })))
 
+    /*  #swagger.tags = ['User']
+    #swagger.description = 'Endpoint to get the specific user.' */
     res.json({ documents: docConfirms, page, pages: Math.ceil(count / pageSize), count })
 })
 
@@ -87,6 +91,8 @@ exports.confirmDocument = asyncHandler(async (req, res) => {
             confirm.status = "Completed"
             await confirm.save()
 
+            /*  #swagger.tags = ['User']
+    #swagger.description = 'Endpoint to get the specific user.' */
             res.status(200).json("Confirm success")
         } else {
             res.status(403)
