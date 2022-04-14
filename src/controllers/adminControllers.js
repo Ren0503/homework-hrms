@@ -41,7 +41,8 @@ exports.loginForAdmin = asyncHandler(async (req, res) => {
         }
         else {
             /*  #swagger.tags = ['Admin']
-    #swagger.description = 'Endpoint to get the specific admin.' */
+                #swagger.description = 'Endpoint to get the specific admin.' 
+            */
             res.json({
                 _id: user._id,
                 name: user.name,
@@ -79,7 +80,11 @@ exports.getListUsersForDocument = asyncHandler(async (req, res) => {
         const users = await User.find(query)
 
         /*  #swagger.tags = ['Admin']
-#swagger.description = 'Endpoint to get the specific admin.' */
+            #swagger.description = 'Endpoint to get the specific admin.'
+            #swagger.security = [{
+                "Bearer": []
+            }]
+        */
         res.json(users)
     } else {
         res.status(404)
@@ -135,7 +140,11 @@ exports.assignUserForDocument = asyncHandler(async (req, res) => {
         const createdConfirms = await Confirm.insertMany(confirms)
 
         /*  #swagger.tags = ['Admin']
-#swagger.description = 'Endpoint to get the specific admin.' */
+            #swagger.description = 'Endpoint to get the specific admin.'
+            #swagger.security = [{
+                "Bearer": []
+            }]
+        */
         res.json(createdConfirms)
     } else {
         res.status(404)

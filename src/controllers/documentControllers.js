@@ -22,7 +22,11 @@ exports.getDocumentsByAdmin = asyncHandler(async (req, res) => {
         .skip(pageSize * (page - 1))
         .sort(sort)
     /*  #swagger.tags = ['Document']
-#swagger.description = 'Endpoint to get the specific document.' */
+        #swagger.description = 'Endpoint to get the specific document.' 
+        #swagger.security = [{
+            "Bearer": []
+        }]
+    */
     res.json({ documents, page, pages: Math.ceil(count / pageSize), count })
 })
 
@@ -49,7 +53,11 @@ exports.getDocumentById = asyncHandler(async (req, res) => {
                     await confirm.save()
                 }
                 /*  #swagger.tags = ['Document']
-            #swagger.description = 'Endpoint to get the specific document.' */
+                    #swagger.description = 'Endpoint to get the specific document.' 
+                    #swagger.security = [{
+                        "Bearer": []
+                    }]
+                */
                 res.json(document)
             } else {
                 res.status(403)
@@ -87,7 +95,11 @@ exports.createDocument = asyncHandler(async (req, res) => {
     const createdDocs = await document.save()
 
     /*  #swagger.tags = ['Document']
-#swagger.description = 'Endpoint to get the specific document.' */
+        #swagger.description = 'Endpoint to get the specific document.'
+        #swagger.security = [{
+            "Bearer": []
+        }]
+    */
     res.status(201).json(createdDocs)
 })
 
@@ -113,7 +125,11 @@ exports.updateDocument = asyncHandler(async (req, res) => {
         await Confirm.updateMany({ docId: document._id }, { status: "Open" })
 
         /*  #swagger.tags = ['Document']
-#swagger.description = 'Endpoint to get the specific document.' */
+            #swagger.description = 'Endpoint to get the specific document.'
+            #swagger.security = [{
+                "Bearer": []
+            }]
+        */
         res.json(updatedDocument)
     } else {
         res.status(404)
@@ -133,7 +149,11 @@ exports.deleteDocument = asyncHandler(async (req, res) => {
         await Document.delete({ _id: req.params.id })
 
         /*  #swagger.tags = ['Document']
-#swagger.description = 'Endpoint to get the specific document.' */
+            #swagger.description = 'Endpoint to get the specific document.'
+            #swagger.security = [{
+                "Bearer": []
+            }]
+        */
         res.json({ message: 'Doc removed' })
     } else {
         res.status(404)
@@ -159,7 +179,11 @@ exports.getDeletedDocumentsByAdmin = asyncHandler(async (req, res) => {
         .sort(sort)
 
     /*  #swagger.tags = ['Document']
-#swagger.description = 'Endpoint to get the specific document.' */
+        #swagger.description = 'Endpoint to get the specific document.'
+        #swagger.security = [{
+            "Bearer": []
+        }]
+    */
     res.json({ documents, page, pages: Math.ceil(count / pageSize), count })
 })
 
@@ -173,7 +197,11 @@ exports.restoreDocument = asyncHandler(async (req, res) => {
         await Confirm.restore({ docId: req.params.id })
 
         /*  #swagger.tags = ['Document']
-    #swagger.description = 'Endpoint to get the specific document.' */
+            #swagger.description = 'Endpoint to get the specific document.'
+            #swagger.security = [{
+                "Bearer": []
+            }]
+        */
         res.json({ message: 'Doc restored' })
     } else {
         res.status(404)

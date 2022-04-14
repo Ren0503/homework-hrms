@@ -25,16 +25,7 @@ const app = express()
 app.use(cors())
 
 // Helmet
-app.use(
-    helmet({
-        contentSecurityPolicy: {
-            directives: {
-                ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-                "script-src": ["'self'", "'unsafe-inline'", "localhost"],
-            },
-        },
-    })
-);
+app.use(helmet());
 
 // Body parser
 app.use(express.urlencoded({ extended: false }))

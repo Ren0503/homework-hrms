@@ -35,7 +35,8 @@ exports.loginForUser = asyncHandler(async (req, res) => {
     }
 
     /*  #swagger.tags = ['User']
-    #swagger.description = 'Endpoint to get the specific user.' */
+        #swagger.description = 'Endpoint to get the specific user.'
+    */
     res.json({
         _id: user._id,
         name: user.name,
@@ -74,7 +75,11 @@ exports.getDocumentsByUser = asyncHandler(async (req, res) => {
     })))
 
     /*  #swagger.tags = ['User']
-    #swagger.description = 'Endpoint to get the specific user.' */
+        #swagger.description = 'Endpoint to get the specific user.' 
+        #swagger.security = [{
+            "Bearer": []
+        }]
+    */
     res.json({ documents: docConfirms, page, pages: Math.ceil(count / pageSize), count })
 })
 
@@ -92,7 +97,11 @@ exports.confirmDocument = asyncHandler(async (req, res) => {
             await confirm.save()
 
             /*  #swagger.tags = ['User']
-    #swagger.description = 'Endpoint to get the specific user.' */
+                #swagger.description = 'Endpoint to get the specific user.'
+                #swagger.security = [{
+                    "Bearer": []
+                }]
+            */
             res.status(200).json("Confirm success")
         } else {
             res.status(403)
