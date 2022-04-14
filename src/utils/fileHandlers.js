@@ -1,47 +1,46 @@
 const path = require('path')
-const multer = require('multer')
 const fs = require('fs')
 const { logger } = require('../config/logging')
+const { encrypt, decrypt } = require('./cryptoData')
 
-// For upload file
-const storage = multer.memoryStorage()
-
-// Validate type
-function checkFileType(file, cb) {
-    const filetypes = /pdf|doc|docx/
-    const extname = filetypes.test(path.extname(file.originalname).toLocaleLowerCase())
-
-    if (extname) {
-        return cb(null, true)
-    } else {
-        cb(new Error('Invalid file type'))
-    }
+// Get path for upload or update new file
+exports.generatePath = (name) => {
+    return path.join('./uploads',  `file-${Date.now()}${path.extname(name)}`)
 }
 
-// Maximum size
-const maxSize = 10 * 1000 * 1000       // 10 MB
-
-const uploadFile = multer({ 
-    storage: storage,
-    fileFilter: function (req, file, cb) {
-        checkFileType(file, cb)
-    },
-    limits: { fileSize: maxSize }
-});
-
-// For delete file
-const deleteFile = (url) => {
-    const exitFile = fs.existsSync(url)
-
-    if (exitFile) {
-        fs.unlinkSync(url)
-        logger.info('Delete success')
-    } else {
-        logger.error('Not found file')
-    }
+// Replace file path in trash
+const getTrashFilePath = (filePath) => {
+    return path.join(path.dirname(filePath), path.basename(filePath, path.extname(filePath)) + "_trash" + path.extname(filePath))
 }
 
-module.exports = {
-    uploadFile,
-    deleteFile,
+exports.moveToTrash = (filePath) => {
+    fs.rename(filePath, getTrashFilePath(filePath), function (err) {
+        if (err)
+            logger.error(err)
+    })
+}
+
+// Replace file path in encrypt or decrypt
+const getEncryptedFilePath = (filePath) => {
+    return path.join(path.dirname(filePath), path.basename(filePath, path.extname(filePath)) + "_encrypted" + path.extname(filePath))
+}
+
+// Encrypt file
+exports.saveEncryptedFile = (buffer, filePath) => {
+    const encrypted = encrypt(process.env.CRYPTO_ALGO, buffer)
+
+    filePath = getEncryptedFilePath(filePath)
+    if (!fs.existsSync(path.dirname(filePath))) {
+        fs.mkdirSync(path.dirname(filePath))
+    }
+
+    fs.writeFileSync(filePath, encrypted)
+}
+
+// Decrypt file
+exports.getEncryptedFile = (filePath) => {
+    filePath = getEncryptedFilePath(filePath)
+    const encrypted = fs.readFileSync(filePath)
+    const buffer = decrypt(process.env.CRYPTO_ALGO, encrypted)
+    return buffer
 }

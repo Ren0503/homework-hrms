@@ -1,16 +1,14 @@
 const asyncHandler = require('express-async-handler')
-const path = require("path");
 
 const Document = require('../models/documentModel')
 const Confirm = require('../models/confirmModel')
 
-const { deleteFile } = require('../utils/fileHandlers')
-const { saveEncryptedFile, getEncryptedFile } = require('../utils/cryptoData')
-
-const secret = {
-    iv: Buffer.from(process.env.SECRET_IV_BUFFER, 'hex'),
-    key: Buffer.from(process.env.SECRET_KEY_BUFFER, 'hex')
-}
+const { 
+    newPath,
+    saveEncryptedFile, 
+    getEncryptedFile, 
+    moveToTrash
+} = require('../utils/fileHandlers')
 
 // @desc    Fetch all documents
 // @route   GET /api/document
@@ -94,11 +92,7 @@ exports.getUrlOfDocument = asyncHandler(async (req, res) => {
             }
         }
 
-        const buffer = getEncryptedFile(
-            document.url,
-            secret.key,
-            secret.iv
-        );
+        const buffer = getEncryptedFile(document.url)
 
         /*  #swagger.tags = ['Document']
             #swagger.description = 'Endpoint to get the specific document.' 
@@ -106,7 +100,7 @@ exports.getUrlOfDocument = asyncHandler(async (req, res) => {
                 "Bearer": []
             }]
         */
-        res.end(buffer);
+        res.end(buffer)
     } else {
         res.status(404)
         throw new Error('Document not found')
@@ -128,15 +122,13 @@ exports.createDocument = asyncHandler(async (req, res) => {
     }
 
     // Generate file path
-    const filePath = path.join("./uploads", `${req.file.fieldname}-${Date.now()}${path.extname(req.file.originalname)}`)
+    const filePath = newPath(req.file.originalname)
 
     // Encrypt file before save
     saveEncryptedFile(
         req.file.buffer,
         filePath,
-        secret.key,
-        secret.iv,
-    );
+    )
 
     const document = new Document({
         title: req.file.originalname,
@@ -163,7 +155,7 @@ exports.updateDocument = asyncHandler(async (req, res) => {
 
     if (document) {
         // delete old file
-        deleteFile(document.url)
+        moveToTrash(document.url)
 
         if (typeof req.fileSizeError != "undefined") {
             res.status(400)
@@ -171,15 +163,13 @@ exports.updateDocument = asyncHandler(async (req, res) => {
         }
 
         // Generate file path
-        const filePath = path.join("./uploads", `${req.file.fieldname}-${Date.now()}${path.extname(req.file.originalname)}`)
+        const filePath = newPath(req.file.originalname)
 
         // Encrypt file before save
         saveEncryptedFile(
             req.file.buffer,
             filePath,
-            secret.key,
-            secret.iv,
-        );
+        )
 
         document.title = req.file.originalname
         document.url = filePath
@@ -207,8 +197,9 @@ exports.deleteDocument = asyncHandler(async (req, res) => {
     const document = await Document.findById(req.params.id)
 
     if (document) {
+        moveToTrash(document.url)
+        
         await Confirm.delete({ docId: document._id })
-
         await Document.delete({ _id: req.params.id })
 
         /*  #swagger.tags = ['Document']
