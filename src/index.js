@@ -25,7 +25,7 @@ const app = express()
 app.use(cors())
 
 // Helmet
-app.use(helmet());
+app.use(helmet())
 
 // Body parser
 app.use(express.urlencoded({ extended: false }))

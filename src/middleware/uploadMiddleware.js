@@ -25,4 +25,4 @@ exports.uploadFile = multer({
         checkFileType(file, cb)
     },
     limits: { fileSize: maxSize }
-});
+})

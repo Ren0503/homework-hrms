@@ -4,9 +4,10 @@ const Document = require('../models/documentModel')
 const Confirm = require('../models/confirmModel')
 
 const { 
-    newPath
+    newPath,
     saveEncryptedFile, 
-    getEncryptedFile 
+    getEncryptedFile, 
+    moveToTrash
 } = require('../utils/fileHandlers')
 
 // @desc    Fetch all documents
@@ -99,7 +100,7 @@ exports.getUrlOfDocument = asyncHandler(async (req, res) => {
                 "Bearer": []
             }]
         */
-        res.end(buffer);
+        res.end(buffer)
     } else {
         res.status(404)
         throw new Error('Document not found')
@@ -127,7 +128,7 @@ exports.createDocument = asyncHandler(async (req, res) => {
     saveEncryptedFile(
         req.file.buffer,
         filePath,
-    );
+    )
 
     const document = new Document({
         title: req.file.originalname,
@@ -154,7 +155,7 @@ exports.updateDocument = asyncHandler(async (req, res) => {
 
     if (document) {
         // delete old file
-        deleteFile(document.url)
+        moveToTrash(document.url)
 
         if (typeof req.fileSizeError != "undefined") {
             res.status(400)
@@ -168,7 +169,7 @@ exports.updateDocument = asyncHandler(async (req, res) => {
         saveEncryptedFile(
             req.file.buffer,
             filePath,
-        );
+        )
 
         document.title = req.file.originalname
         document.url = filePath
@@ -196,8 +197,9 @@ exports.deleteDocument = asyncHandler(async (req, res) => {
     const document = await Document.findById(req.params.id)
 
     if (document) {
+        moveToTrash(document.url)
+        
         await Confirm.delete({ docId: document._id })
-
         await Document.delete({ _id: req.params.id })
 
         /*  #swagger.tags = ['Document']

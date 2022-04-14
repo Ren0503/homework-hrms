@@ -1,4 +1,4 @@
-const crypto = require("crypto");
+const crypto = require("crypto")
 
 const secret = {
     iv: Buffer.from(process.env.SECRET_IV_BUFFER, 'hex'),
@@ -7,13 +7,13 @@ const secret = {
 
 // Encrypt and decrypt any data
 exports.encrypt = (algorithm, buffer) => {
-    const cipher = crypto.createCipheriv(algorithm, secret.key, secret.iv);
-    const encrypted = Buffer.concat([cipher.update(buffer), cipher.final()]);
-    return encrypted;
-};
+    const cipher = crypto.createCipheriv(algorithm, secret.key, secret.iv)
+    const encrypted = Buffer.concat([cipher.update(buffer), cipher.final()])
+    return encrypted
+}
 
 exports.decrypt = (algorithm, buffer) => {
-    const decipher = crypto.createDecipheriv(algorithm, secret.key, secret.iv);
-    const decrypted = Buffer.concat([decipher.update(buffer), decipher.final()]);
-    return decrypted;
+    const decipher = crypto.createDecipheriv(algorithm, secret.key, secret.iv)
+    const decrypted = Buffer.concat([decipher.update(buffer), decipher.final()])
+    return decrypted
 }
