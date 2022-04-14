@@ -1,16 +1,13 @@
 const asyncHandler = require('express-async-handler')
-const path = require("path");
 
 const Document = require('../models/documentModel')
 const Confirm = require('../models/confirmModel')
 
-const { deleteFile } = require('../utils/fileHandlers')
-const { saveEncryptedFile, getEncryptedFile } = require('../utils/cryptoData')
-
-const secret = {
-    iv: Buffer.from(process.env.SECRET_IV_BUFFER, 'hex'),
-    key: Buffer.from(process.env.SECRET_KEY_BUFFER, 'hex')
-}
+const { 
+    newPath
+    saveEncryptedFile, 
+    getEncryptedFile 
+} = require('../utils/fileHandlers')
 
 // @desc    Fetch all documents
 // @route   GET /api/document
@@ -94,11 +91,7 @@ exports.getUrlOfDocument = asyncHandler(async (req, res) => {
             }
         }
 
-        const buffer = getEncryptedFile(
-            document.url,
-            secret.key,
-            secret.iv
-        );
+        const buffer = getEncryptedFile(document.url)
 
         /*  #swagger.tags = ['Document']
             #swagger.description = 'Endpoint to get the specific document.' 
@@ -128,14 +121,12 @@ exports.createDocument = asyncHandler(async (req, res) => {
     }
 
     // Generate file path
-    const filePath = path.join("./uploads", `${req.file.fieldname}-${Date.now()}${path.extname(req.file.originalname)}`)
+    const filePath = newPath(req.file.originalname)
 
     // Encrypt file before save
     saveEncryptedFile(
         req.file.buffer,
         filePath,
-        secret.key,
-        secret.iv,
     );
 
     const document = new Document({
@@ -171,14 +162,12 @@ exports.updateDocument = asyncHandler(async (req, res) => {
         }
 
         // Generate file path
-        const filePath = path.join("./uploads", `${req.file.fieldname}-${Date.now()}${path.extname(req.file.originalname)}`)
+        const filePath = newPath(req.file.originalname)
 
         // Encrypt file before save
         saveEncryptedFile(
             req.file.buffer,
             filePath,
-            secret.key,
-            secret.iv,
         );
 
         document.title = req.file.originalname
