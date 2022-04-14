@@ -15,6 +15,10 @@ router.route('/deleted')
     .get(protect, admin, DocCtrl.getDeletedDocumentsByAdmin)
 
 /* NOTE: Completing informations automaticaly obtaineds */
+router.route('/:id/url')
+    .get(protect, DocCtrl.getUrlOfDocument)
+
+/* NOTE: Completing informations automaticaly obtaineds */
 router.route('/:id')
     .get(protect, DocCtrl.getDocumentById)
     .put(protect, admin, uploadFile.single('file'), DocCtrl.updateDocument)

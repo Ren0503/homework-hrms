@@ -1,15 +1,22 @@
 const asyncHandler = require('express-async-handler')
+const path = require("path");
 
 const Document = require('../models/documentModel')
 const Confirm = require('../models/confirmModel')
 
 const { deleteFile } = require('../utils/fileHandlers')
+const { saveEncryptedFile, getEncryptedFile } = require('../utils/cryptoData')
+
+const secret = {
+    iv: Buffer.from(process.env.SECRET_IV_BUFFER, 'hex'),
+    key: Buffer.from(process.env.SECRET_KEY_BUFFER, 'hex')
+}
 
 // @desc    Fetch all documents
 // @route   GET /api/document
 // @access  Private/Admin
 exports.getDocumentsByAdmin = asyncHandler(async (req, res) => {
-    const pageSize = Number(req.query.perPage) || 4
+    const pageSize = Number(req.query.perPage) || 12
     const page = Number(req.query.pageNumber) || 1
     const sort = req.query.sort || '-createdAt'
 
@@ -40,32 +47,66 @@ exports.getDocumentById = asyncHandler(async (req, res) => {
         if (req.user.role !== 9) {
             const confirm = await Confirm.findOne({ $and: [{ docId: document._id }, { userId: req.user._id }] })
 
-            if (confirm) {
-                // Because file doc auto download when click
-                if (document.url.includes('.doc')) {
-                    confirm.status = "Completed"
-                    await confirm.save()
-                }
-
-                // Check confirm have confirmed yet
-                if (confirm.status !== "Completed") {
-                    confirm.status = "Reading"
-                    await confirm.save()
-                }
-                /*  #swagger.tags = ['Document']
-                    #swagger.description = 'Endpoint to get the specific document.' 
-                    #swagger.security = [{
-                        "Bearer": []
-                    }]
-                */
-                res.json(document)
-            } else {
+            if (!confirm) {
                 res.status(403)
                 throw new Error('Not authorized, need admin assigned')
             }
-        } else {
-            res.json(document)
+
+            // Because file doc auto download when click
+            if (document.url.includes('.doc')) {
+                confirm.status = "Completed"
+                await confirm.save()
+            }
+
+            // Check confirm have confirmed yet
+            if (confirm.status !== "Completed") {
+                confirm.status = "Reading"
+                await confirm.save()
+            }
         }
+
+        /*  #swagger.tags = ['Document']
+            #swagger.description = 'Endpoint to get the specific document.' 
+            #swagger.security = [{
+                "Bearer": []
+            }]
+        */
+        res.json(document)
+    } else {
+        res.status(404)
+        throw new Error('Document not found')
+    }
+})
+
+// @desc    Fetch url of document
+// @route   GET /api/document/:id/url
+// @access  Private
+exports.getUrlOfDocument = asyncHandler(async (req, res) => {
+    const document = await Document.findById(req.params.id)
+
+    if (document) {
+        if (req.user.role !== 9) {
+            const confirm = await Confirm.findOne({ $and: [{ docId: document._id }, { userId: req.user._id }] })
+
+            if (!confirm) {
+                res.status(403)
+                throw new Error('Not authorized, need admin assigned')
+            }
+        }
+
+        const buffer = getEncryptedFile(
+            document.url,
+            secret.key,
+            secret.iv
+        );
+
+        /*  #swagger.tags = ['Document']
+            #swagger.description = 'Endpoint to get the specific document.' 
+            #swagger.security = [{
+                "Bearer": []
+            }]
+        */
+        res.end(buffer);
     } else {
         res.status(404)
         throw new Error('Document not found')
@@ -86,10 +127,21 @@ exports.createDocument = asyncHandler(async (req, res) => {
         throw new Error("File too large")
     }
 
+    // Generate file path
+    const filePath = path.join("./uploads", `${req.file.fieldname}-${Date.now()}${path.extname(req.file.originalname)}`)
+
+    // Encrypt file before save
+    saveEncryptedFile(
+        req.file.buffer,
+        filePath,
+        secret.key,
+        secret.iv,
+    );
+
     const document = new Document({
         title: req.file.originalname,
         postedBy: req.user.id,
-        url: req.file.path,
+        url: filePath,
     })
 
     const createdDocs = await document.save()
@@ -118,8 +170,19 @@ exports.updateDocument = asyncHandler(async (req, res) => {
             throw new Error("File too large")
         }
 
+        // Generate file path
+        const filePath = path.join("./uploads", `${req.file.fieldname}-${Date.now()}${path.extname(req.file.originalname)}`)
+
+        // Encrypt file before save
+        saveEncryptedFile(
+            req.file.buffer,
+            filePath,
+            secret.key,
+            secret.iv,
+        );
+
         document.title = req.file.originalname
-        document.url = req.file.path
+        document.url = filePath
 
         const updatedDocument = await document.save()
         await Confirm.updateMany({ docId: document._id }, { status: "Open" })

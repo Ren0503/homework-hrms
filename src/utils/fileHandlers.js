@@ -4,17 +4,7 @@ const fs = require('fs')
 const { logger } = require('../config/logging')
 
 // For upload file
-const storage = multer.diskStorage({
-    destination(req, file, cb) {
-        cb(null, 'uploads/')
-    },
-    filename(req, file, cb) {
-        cb(
-            null,
-            `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`
-        )
-    },
-})
+const storage = multer.memoryStorage()
 
 // Validate type
 function checkFileType(file, cb) {
@@ -31,13 +21,13 @@ function checkFileType(file, cb) {
 // Maximum size
 const maxSize = 10 * 1000 * 1000       // 10 MB
 
-const uploadFile = multer({
+const uploadFile = multer({ 
     storage: storage,
     fileFilter: function (req, file, cb) {
         checkFileType(file, cb)
     },
     limits: { fileSize: maxSize }
-})
+});
 
 // For delete file
 const deleteFile = (url) => {
