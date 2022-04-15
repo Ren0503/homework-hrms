@@ -275,6 +275,11 @@
             "type": "string"
           },
           {
+            "name": "perPage",
+            "in": "query",
+            "type": "string"
+          },
+          {
             "name": "pageNumber",
             "in": "query",
             "type": "string"
@@ -537,6 +542,11 @@
           {
             "name": "authorization",
             "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "perPage",
+            "in": "query",
             "type": "string"
           },
           {

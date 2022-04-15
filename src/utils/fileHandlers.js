@@ -30,11 +30,8 @@ exports.removeToTrash = (filePath) => {
 }
 
 exports.restoreFromTrash = (filePath) => {
-    console.log(filePath)
     oldPath = getTrashFilePath(filePath)
-    console.log(oldPath)
     newPath = getEncryptedFilePath(filePath)
-    console.log(newPath)
 
     fs.renameSync(oldPath, newPath)
 }

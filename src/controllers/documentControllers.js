@@ -1,12 +1,13 @@
 const asyncHandler = require('express-async-handler')
+const stream = require('stream')
 
 const Document = require('../models/documentModel')
 const Confirm = require('../models/confirmModel')
 
-const { 
+const {
     generatePath,
-    saveEncryptedFile, 
-    getEncryptedFile, 
+    saveEncryptedFile,
+    getEncryptedFile,
     removeToTrash,
     restoreFromTrash
 } = require('../utils/fileHandlers')
@@ -95,6 +96,16 @@ exports.getUrlOfDocument = asyncHandler(async (req, res) => {
 
         const buffer = getEncryptedFile(document.url)
 
+        if (document.url.includes('.doc')) {
+            const readStream = new stream.PassThrough();
+            readStream.end(buffer);
+            res.writeHead(200, {
+                "Content-disposition": "attachment; filename=" + document.title,
+                "Content-Type": "application/octet-stream",
+                "Content-Length": buffer.length
+            });
+            return res.end(buffer)
+        }
         /*  #swagger.tags = ['Document']
             #swagger.description = 'Endpoint to get the specific document.' 
             #swagger.security = [{
@@ -198,8 +209,9 @@ exports.deleteDocument = asyncHandler(async (req, res) => {
     const document = await Document.findById(req.params.id)
 
     if (document) {
+        // Remove file
         removeToTrash(document.url)
-        
+
         await Confirm.delete({ docId: document._id })
         await Document.delete({ _id: req.params.id })
 
