@@ -5,24 +5,38 @@ const { encrypt, decrypt } = require('./cryptoData')
 
 // Get path for upload or update new file
 exports.generatePath = (name) => {
-    return path.join('./uploads',  `file-${Date.now()}${path.extname(name)}`)
+    return path.join('./uploads', `file-${Date.now()}${path.extname(name)}`)
 }
 
-// Replace file path in trash
+// Replace file path in encrypt or decrypt
 const getTrashFilePath = (filePath) => {
-    return path.join(path.dirname(filePath), path.basename(filePath, path.extname(filePath)) + "_trash" + path.extname(filePath))
-}
-
-exports.moveToTrash = (filePath) => {
-    fs.rename(filePath, getTrashFilePath(filePath), function (err) {
-        if (err)
-            logger.error(err)
-    })
+    return path.join(`${path.dirname(filePath)}/trash`, `${path.basename(filePath, path.extname(filePath))}_encrypted${path.extname(filePath)}`)
 }
 
 // Replace file path in encrypt or decrypt
 const getEncryptedFilePath = (filePath) => {
-    return path.join(path.dirname(filePath), path.basename(filePath, path.extname(filePath)) + "_encrypted" + path.extname(filePath))
+    return path.join(path.dirname(filePath), `${path.basename(filePath, path.extname(filePath))}_encrypted${path.extname(filePath)}`)
+}
+
+exports.removeToTrash = (filePath) => {
+    oldPath = getEncryptedFilePath(filePath)
+    newPath = getTrashFilePath(filePath)
+
+    if (!fs.existsSync(path.dirname(newPath))) {
+        fs.mkdirSync(path.dirname(newPath))
+    }
+
+    fs.renameSync(oldPath, newPath)
+}
+
+exports.restoreFromTrash = (filePath) => {
+    console.log(filePath)
+    oldPath = getTrashFilePath(filePath)
+    console.log(oldPath)
+    newPath = getEncryptedFilePath(filePath)
+    console.log(newPath)
+
+    fs.renameSync(oldPath, newPath)
 }
 
 // Encrypt file

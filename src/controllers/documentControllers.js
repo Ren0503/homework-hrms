@@ -4,10 +4,11 @@ const Document = require('../models/documentModel')
 const Confirm = require('../models/confirmModel')
 
 const { 
-    newPath,
+    generatePath,
     saveEncryptedFile, 
     getEncryptedFile, 
-    moveToTrash
+    removeToTrash,
+    restoreFromTrash
 } = require('../utils/fileHandlers')
 
 // @desc    Fetch all documents
@@ -122,7 +123,7 @@ exports.createDocument = asyncHandler(async (req, res) => {
     }
 
     // Generate file path
-    const filePath = newPath(req.file.originalname)
+    const filePath = generatePath(req.file.originalname)
 
     // Encrypt file before save
     saveEncryptedFile(
@@ -155,7 +156,7 @@ exports.updateDocument = asyncHandler(async (req, res) => {
 
     if (document) {
         // delete old file
-        moveToTrash(document.url)
+        removeToTrash(document.url)
 
         if (typeof req.fileSizeError != "undefined") {
             res.status(400)
@@ -163,7 +164,7 @@ exports.updateDocument = asyncHandler(async (req, res) => {
         }
 
         // Generate file path
-        const filePath = newPath(req.file.originalname)
+        const filePath = generatePath(req.file.originalname)
 
         // Encrypt file before save
         saveEncryptedFile(
@@ -197,7 +198,7 @@ exports.deleteDocument = asyncHandler(async (req, res) => {
     const document = await Document.findById(req.params.id)
 
     if (document) {
-        moveToTrash(document.url)
+        removeToTrash(document.url)
         
         await Confirm.delete({ docId: document._id })
         await Document.delete({ _id: req.params.id })
@@ -219,7 +220,7 @@ exports.deleteDocument = asyncHandler(async (req, res) => {
 // @route   GET /api/document/deleted
 // @access  Private/Admin
 exports.getDeletedDocumentsByAdmin = asyncHandler(async (req, res) => {
-    const pageSize = 5
+    const pageSize = Number(req.query.perPage) || 12
     const page = Number(req.query.pageNumber) || 1
     const sort = req.query.sort || '-createdAt'
 
@@ -248,7 +249,12 @@ exports.restoreDocument = asyncHandler(async (req, res) => {
     const document = await Document.restore({ _id: req.params.id })
 
     if (document) {
+        // Restore confirm relative
         await Confirm.restore({ docId: req.params.id })
+
+        // Restore file
+        const documentDetail = await Document.findById(req.params.id)
+        restoreFromTrash(documentDetail.url)
 
         /*  #swagger.tags = ['Document']
             #swagger.description = 'Endpoint to get the specific document.'

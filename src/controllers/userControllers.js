@@ -6,7 +6,7 @@ const Document = require('../models/documentModel')
 const User = require('../models/userModel')
 
 const googleAuth = require('../utils/googleAuth')
-const generateToken = require('../utils/generateToken')
+const { generateToken } = require('../utils/generateToken')
 
 // @desc    Login for user
 // @route   POST /api/admin/login
@@ -50,7 +50,7 @@ exports.loginForUser = asyncHandler(async (req, res) => {
 // @route   GET /api/user/documents
 // @access  Private
 exports.getDocumentsByUser = asyncHandler(async (req, res) => {
-    const pageSize = 4
+    const pageSize = Number(req.query.perPage) || 12
     const page = Number(req.query.pageNumber) || 1
 
     const docConfirms = []
