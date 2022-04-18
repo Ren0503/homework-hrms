@@ -8,9 +8,13 @@ const { messages } = require('../translate')
 * Returns nothing, it calls next() to continue forward
 */
 exports.startPolyglot = (req, res, next) => {
-    
     // Get the locale from express-locale
-    const locale = req.headers["accept-language"].substring(0,2)
+    let locale
+    if (req.headers["accept-language"]) {
+        locale = req.headers["accept-language"].substring(0,2)
+    } else {
+        locale = 'en'
+    }
 
     // Start Polyglot and add it to the req
     req.polyglot = new Polyglot()

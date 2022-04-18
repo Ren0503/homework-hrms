@@ -4,7 +4,7 @@ const messages = {
         // Authenticate
         "200-auth": "Successful Authentication",
         "401-token": "Not authorized, token failed",
-        "401-notken": "Not authorized, no token",
+        "401-notoken": "Not authorized, no token",
         "401-admin": "Invalid name or password",
         "403": "Not authorized as an admin",
         "403-assign": "Not authorized, need admin assigned",
@@ -33,13 +33,14 @@ const messages = {
         "200-listUser": "Get successful users for confirm",
         "400-confirm": "All users you send are assigned",
         "201-confirm": "Assigned Success",
+        "200-unassign": "Unassigned Success",
         "200-confirm": "Confirm success"
     },
     vi: {
         // Authenticate
         "200-auth": "Xác thực thành công",
         "401-token": "Lỗi token, xác thực thất bại",
-        "401-notken": "Không có token, xác thực thất bại",
+        "401-notoken": "Không có token, xác thực thất bại",
         "401-admin": "Sai tên hoặc mật khẩu",
         "403": "Tài khoản không phải là quản trị viên",
         "403-assign": "Không có quyền truy cập, cần quản trị viên cho phép",
@@ -67,6 +68,7 @@ const messages = {
         "200-listUser": "Lấy danh sách người dùng thành công",
         "400-confirm": "Danh sách người dùng bạn gửi đã được gán",
         "201-confirm": "Gán thành công",
+        "200-unassign": "Gỡ thành công",
         "200-confirm": "Xác nhận thành công"
     }
 }

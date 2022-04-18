@@ -18,13 +18,21 @@ const {
 exports.getDocumentsByAdmin = asyncHandler(async (req, res) => {
     const pageSize = Number(req.query.perPage) || 12
     const page = Number(req.query.pageNumber) || 1
-    const sort = req.query.sort || '-createdAt'
+    const sort = req.query.sort || '-updatedAt'
+    const keyword = req.query.keyword
+        ? {
+            title: {
+                $regex: req.query.keyword,
+                $options: 'i',
+            },
+        }
+        : {};
 
     const query = { deleted: false }
 
-    const count = await Document.countDocuments(query)
+    const count = await Document.countDocuments({ ...keyword, ...query })
 
-    const documents = await Document.find(query)
+    const documents = await Document.find({ ...keyword, ...query })
         .limit(pageSize)
         .skip(pageSize * (page - 1))
         .sort(sort)
@@ -238,7 +246,6 @@ exports.deleteManyDocuments = asyncHandler(async (req, res) => {
     const docExistDel = await Document.find({ _id: { $in: docDelete } })
 
     if (docExistDel) {
-        console.log(docExistDel)
         await Promise.all(docExistDel.map(async (document) => {
             // Remove file
             removeToTrash(document.url)

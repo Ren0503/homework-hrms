@@ -60,10 +60,10 @@ exports.loginForAdmin = asyncHandler(async (req, res) => {
     }
 })
 
-// @desc    Get list of user
-// @route   GET /api/admin/documents/:id/users
+// @desc    Get list of user for assign 
+// @route   GET /api/admin/documents/:id/assign-users
 // @access  Private/Admin
-exports.getListUsersForDocument = asyncHandler(async (req, res) => {
+exports.getAssignUsersForDocument = asyncHandler(async (req, res) => {
     const document = await Document.findById(req.params.id)
     const userConfirms = []
     let query = { role: { $ne: 9 } }
@@ -75,6 +75,38 @@ exports.getListUsersForDocument = asyncHandler(async (req, res) => {
             confirms.map((c) => (userConfirms.push(c.userId)))
 
             query._id = { $nin: userConfirms }
+        }
+
+        const users = await User.find(query)
+
+        /*  #swagger.tags = ['Admin']
+            #swagger.description = 'Endpoint to get the specific admin.'
+            #swagger.security = [{
+                "Bearer": []
+            }]
+        */
+        res.json(users)
+    } else {
+        res.status(404)
+        throw new Error(req.polyglot.t('404-doc'))
+    }
+})
+
+// @desc    Get list of user for Unassign
+// @route   GET /api/admin/documents/:id/unassign-users
+// @access  Private/Admin
+exports.getUnassignUsersForDocument = asyncHandler(async (req, res) => {
+    const document = await Document.findById(req.params.id)
+    const userConfirms = []
+    let query = { role: { $ne: 9 } }
+
+    if (document) {
+        const confirms = await Confirm.find({ docId: req.params.id })
+
+        if (confirms) {
+            confirms.map((c) => (userConfirms.push(c.userId)))
+
+            query._id = { $in: userConfirms }
         }
 
         const users = await User.find(query)
@@ -152,6 +184,38 @@ exports.assignUserForDocument = asyncHandler(async (req, res) => {
     }
 })
 
+// @desc    Unassign for user
+// @route   POST /api/admin/documents/:id/unassign
+// @access  Private/Admin
+exports.unassignUserForDocument = asyncHandler(async (req, res) => {
+    // Validate body
+    const result = validationResult(req)
+
+    if (!result.isEmpty()) {
+        const errors = result.array({ onlyFirstError: true })
+        return res.status(422).json({ errors })
+    }
+
+    const document = await Document.findById(req.params.id)
+
+    if (document) {
+        // Get list users from body
+        const [...userUnassign] = req.body.userIds
+
+        await Confirm.remove({ $and: [{ docId: req.params.id }, { userId: { $in: userUnassign } }] })
+
+        /*  #swagger.tags = ['Admin']
+            #swagger.description = 'Endpoint to get the specific admin.'
+            #swagger.security = [{
+                "Bearer": []
+            }]
+        */        
+       res.json({ message: req.polyglot.t('200-unassign')})
+    } else {
+        res.status(404)
+        throw new Error(req.polyglot.t('404-doc'))
+    }
+})
 exports.loginAdminValidate = [
     body('name')
         .exists()

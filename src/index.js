@@ -70,7 +70,12 @@ const PORT = process.env.PORT || 5000
 
 // Socket IO
 const httpServer = createServer(app);
-const io = new Server(httpServer, { pingTimeout: 60000 });
+const io = new Server(httpServer, { 
+    pingTimeout: 60000,
+    cors: {
+        origin: process.env.FRONTEND_URL,
+    }
+});
 
 io.on('connection', (socket) => {
     console.log('Connected to socket.io');
