@@ -5,8 +5,8 @@ const mongoose = require('mongoose')
 const helmet = require('helmet')
 const dotenv = require('dotenv')
 const morgan = require('morgan')
-const { Server } = require('socket.io')
 const { createServer } = require('http')
+const socket = require('./socket')
 const swaggerUi = require('swagger-ui-express')
 const swaggerFile = require('../swagger_output.json')
 const { notFound, errorHandler } = require('./middleware/errorMiddleware')
@@ -70,25 +70,7 @@ const PORT = process.env.PORT || 5000
 
 // Socket IO
 const httpServer = createServer(app);
-const io = new Server(httpServer, { 
-    pingTimeout: 60000,
-    cors: {
-        origin: process.env.FRONTEND_URL,
-    }
-});
-
-io.on('connection', (socket) => {
-    console.log('Connected to socket.io');
-    socket.on('setup', (userData) => {
-        socket.join(userData._id);
-        socket.emit('connected');
-    });
-
-    socket.off('setup', () => {
-        console.log('USER DISCONNECTED');
-        socket.leave(userData._id);
-    });
-});
+socket(httpServer);
 
 httpServer.listen(
     PORT,
