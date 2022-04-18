@@ -15,7 +15,7 @@ const confirmSchema = new mongoose.Schema({
     status: {
         type: String,
         required: true,
-        default: 'Open'
+        default: 'O'
     }
 }, {
     timestamps: true,

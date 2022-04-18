@@ -21,13 +21,13 @@ exports.protect = asyncHandler(async (req, res, next) => {
         } catch (error) {
             logger.error(error)
             res.status(401)
-            throw new Error('Not authorized, token failed')
+            throw new Error(req.polyglot.t('401-token'))
         }
     }
 
     if (!token) {
         res.status(401)
-        throw new Error('Not authorized, no token')
+        throw new Error(req.polyglot.t('401-notoken'))
     }
 })
 
@@ -36,6 +36,6 @@ exports.admin = (req, res, next) => {
         next()
     } else {
         res.status(403)
-        throw new Error('Not authorized as an admin')
+        throw new Error(req.polyglot.t('403'))
     }
 }

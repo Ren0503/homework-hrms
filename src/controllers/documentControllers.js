@@ -49,18 +49,18 @@ exports.getDocumentById = asyncHandler(async (req, res) => {
 
             if (!confirm) {
                 res.status(403)
-                throw new Error('Not authorized, need admin assigned')
+                throw new Error(req.polyglot.t('403-assign'))
             }
 
             // Because file doc auto download when click
             if (document.url.includes('.doc')) {
-                confirm.status = "Completed"
+                confirm.status = "C"
                 await confirm.save()
             }
 
             // Check confirm have confirmed yet
-            if (confirm.status !== "Completed") {
-                confirm.status = "Reading"
+            if (confirm.status !== "C") {
+                confirm.status = "R"
                 await confirm.save()
             }
         }
@@ -74,7 +74,7 @@ exports.getDocumentById = asyncHandler(async (req, res) => {
         res.json(document)
     } else {
         res.status(404)
-        throw new Error('Document not found')
+        throw new Error(req.polyglot.t('404-doc'))
     }
 })
 
@@ -90,7 +90,7 @@ exports.getUrlOfDocument = asyncHandler(async (req, res) => {
 
             if (!confirm) {
                 res.status(403)
-                throw new Error('Not authorized, need admin assigned')
+                throw new Error(req.polyglot.t('403-assign'))
             }
         }
 
@@ -115,7 +115,7 @@ exports.getUrlOfDocument = asyncHandler(async (req, res) => {
         res.end(buffer)
     } else {
         res.status(404)
-        throw new Error('Document not found')
+        throw new Error(req.polyglot.t('404-doc'))
     }
 })
 
@@ -125,12 +125,12 @@ exports.getUrlOfDocument = asyncHandler(async (req, res) => {
 exports.createDocument = asyncHandler(async (req, res) => {
     if (!req.file) {
         res.status(400)
-        throw new Error("Need file in input")
+        throw new Error(req.polyglot.t('400-docCreateEmpty'))
     }
 
     if (typeof req.fileSizeError != "undefined") {
         res.status(400)
-        throw new Error("File too large")
+        throw new Error(req.polyglot.t('400-docCreateBig'))
     }
 
     // Generate file path
@@ -171,7 +171,7 @@ exports.updateDocument = asyncHandler(async (req, res) => {
 
         if (typeof req.fileSizeError != "undefined") {
             res.status(400)
-            throw new Error("File too large")
+            throw new Error(req.polyglot.t('400-docCreateBig'))
         }
 
         // Generate file path
@@ -187,7 +187,7 @@ exports.updateDocument = asyncHandler(async (req, res) => {
         document.url = filePath
 
         const updatedDocument = await document.save()
-        await Confirm.updateMany({ docId: document._id }, { status: "Open" })
+        await Confirm.updateMany({ docId: document._id }, { status: "O" })
 
         /*  #swagger.tags = ['Document']
             #swagger.description = 'Endpoint to get the specific document.'
@@ -198,7 +198,7 @@ exports.updateDocument = asyncHandler(async (req, res) => {
         res.json(updatedDocument)
     } else {
         res.status(404)
-        throw new Error('Doc not found')
+        throw new Error(req.polyglot.t('404-doc'))
     }
 })
 
@@ -221,10 +221,42 @@ exports.deleteDocument = asyncHandler(async (req, res) => {
                 "Bearer": []
             }]
         */
-        res.json({ message: 'Doc removed' })
+        res.json({ message: req.polyglot.t('200-docDelete') })
     } else {
         res.status(404)
-        throw new Error('Doc not found')
+        throw new Error(req.polyglot.t('404-doc'))
+    }
+})
+
+// @desc    Delete many documents
+// @route   DELETE /api/document/deleted
+// @access  Private/Admin
+exports.deleteManyDocuments = asyncHandler(async (req, res) => {
+    const docDelete = req.body.docIds
+
+    // Find exists documents need delete
+    const docExistDel = await Document.find({ _id: { $in: docDelete } })
+
+    if (docExistDel) {
+        console.log(docExistDel)
+        await Promise.all(docExistDel.map(async (document) => {
+            // Remove file
+            removeToTrash(document.url)
+
+            await Confirm.delete({ docId: document._id })
+            await Document.delete({ _id: document._id })
+        }))
+
+        /*  #swagger.tags = ['Document']
+            #swagger.description = 'Endpoint to get the specific document.'
+            #swagger.security = [{
+                "Bearer": []
+            }]
+        */
+        res.json({ message: req.polyglot.t('200-docsDelete') })
+    } else {
+        res.status(404)
+        throw new Error(req.polyglot.t('404-doc'))
     }
 })
 
@@ -274,9 +306,9 @@ exports.restoreDocument = asyncHandler(async (req, res) => {
                 "Bearer": []
             }]
         */
-        res.json({ message: 'Doc restored' })
+        res.json({ message: req.polyglot.t('200-docRestore') })
     } else {
         res.status(404)
-        throw new Error('Doc not found')
+        throw new Error(req.polyglot.t('404-doc'))
     }
 })

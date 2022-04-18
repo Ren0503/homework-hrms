@@ -21,6 +21,8 @@ exports.loginForUser = asyncHandler(async (req, res) => {
 
     const tokenId = req.body.tokenId
     const profile = await googleAuth.getProfileInfo(tokenId)
+    if (!profile)
+        return res.status(404)
 
     let user = await User.findOne({ socialId: profile.sub })
 
@@ -93,7 +95,7 @@ exports.confirmDocument = asyncHandler(async (req, res) => {
         const confirm = await Confirm.findOne({ $and: [{ docId: document._id }, { userId: req.user._id }] })
 
         if (confirm) {
-            confirm.status = "Completed"
+            confirm.status = "C"
             await confirm.save()
 
             /*  #swagger.tags = ['User']
@@ -105,11 +107,11 @@ exports.confirmDocument = asyncHandler(async (req, res) => {
             res.status(200).json("Confirm success")
         } else {
             res.status(403)
-            throw new Error('Not authorized, need admin assigned')
+            throw new Error(req.polyglot.t('403-assign'))
         }
     } else {
         res.status(404)
-        throw new Error('Not found doc')
+        throw new Error(req.polyglot.t('404-doc'))
     }
 })
 

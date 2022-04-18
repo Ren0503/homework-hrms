@@ -37,7 +37,7 @@ exports.loginForAdmin = asyncHandler(async (req, res) => {
             await cache.save(ip, data + 1, 60)
 
             res.status(403)
-            throw new Error('Not authorized as an admin')
+            throw new Error(req.polyglot.t('403'))
         }
         else {
             /*  #swagger.tags = ['Admin']
@@ -56,7 +56,7 @@ exports.loginForAdmin = asyncHandler(async (req, res) => {
         await cache.save(ip, data + 1, 60)
 
         res.status(401)
-        throw new Error('Invalid name or password')
+        throw new Error(req.polyglot.t('401-admin'))
     }
 })
 
@@ -88,7 +88,7 @@ exports.getListUsersForDocument = asyncHandler(async (req, res) => {
         res.json(users)
     } else {
         res.status(404)
-        throw new Error('Document not found')
+        throw new Error(req.polyglot.t('404-doc'))
     }
 })
 
@@ -121,7 +121,7 @@ exports.assignUserForDocument = asyncHandler(async (req, res) => {
 
             if (JSON.stringify(userAssign) == JSON.stringify(userExits)) {
                 res.status(400)
-                throw new Error('All users you send are assigned')
+                throw new Error(req.polyglot.t('400-confirm'))
             }
         }
 
@@ -148,7 +148,7 @@ exports.assignUserForDocument = asyncHandler(async (req, res) => {
         res.json(createdConfirms)
     } else {
         res.status(404)
-        throw new Error('Document not found')
+        throw new Error(req.polyglot.t('404-doc'))
     }
 })
 

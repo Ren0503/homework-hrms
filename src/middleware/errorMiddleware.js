@@ -1,7 +1,7 @@
 const { logger } = require('../config/logging')
 
 exports.notFound = (req, res, next) => {
-    const error = new Error(`Not Found - ${req.originalUrl}`)
+    const error = new Error(req.polyglot.t('404'))
     res.status(404)
     next(error)
 }

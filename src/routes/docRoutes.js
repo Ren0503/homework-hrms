@@ -13,6 +13,7 @@ router.route('/')
 /* NOTE: Completing informations automaticaly obtaineds */
 router.route('/deleted')
     .get(protect, admin, DocCtrl.getDeletedDocumentsByAdmin)
+    .delete(protect, admin, DocCtrl.deleteManyDocuments)
 
 /* NOTE: Completing informations automaticaly obtaineds */
 router.route('/:id/url')
