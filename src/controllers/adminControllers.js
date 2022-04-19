@@ -6,7 +6,7 @@ const Confirm = require('../models/confirmModel')
 const User = require('../models/userModel')
 
 const cache = require('../config/cache')
-const { generateToken } = require('../utils/generateToken')
+const { generateToken } = require('../utils/token')
 
 // @desc    Login for admin
 // @route   POST /api/admin/login

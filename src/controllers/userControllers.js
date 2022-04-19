@@ -6,7 +6,7 @@ const Document = require('../models/documentModel')
 const User = require('../models/userModel')
 
 const googleAuth = require('../utils/googleAuth')
-const { generateToken } = require('../utils/generateToken')
+const { generateToken } = require('../utils/token')
 
 // @desc    Login for user
 // @route   POST /api/admin/login

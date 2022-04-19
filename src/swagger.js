@@ -23,6 +23,10 @@ const doc = {
         {
             "name": "Admin",
             "description": "Endpoints"
+        },
+        {
+            "name": "Notification",
+            "description": "Endpoints"
         }
     ],
     securityDefinitions: {
