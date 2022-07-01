@@ -4,7 +4,6 @@ const express = require('express')
 const helmet = require('helmet')
 const dotenv = require('dotenv')
 const logger = require('morgan')
-const morgan = require('morgan')
 const { createServer } = require('http')
 const socket = require('./socket')
 const swaggerUi = require('swagger-ui-express')
@@ -12,6 +11,9 @@ const swaggerFile = require('../swagger_output.json')
 const { notFound, errorHandler } = require('./middleware/errorMiddleware')
 const loggerWinston = require('./config/logging')
 const { startPolyglot } = require('./utils/polygot')
+const expressWinston = require('express-winston')
+expressWinston.requestWhitelist.push('body')
+expressWinston.responseWhitelist.push('body')
 
 dotenv.config()
 
@@ -35,16 +37,7 @@ app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
 // Logging
-if (process.env.NODE_ENV === 'development') {
-    logger.stream = {
-        write: function (message, encoding) {
-            logger.info(message)
-        }
-    }
-
-    app.use(morgan("combined", { "stream": logger.stream }))
-    app.use(morgan('dev'))
-}
+express.use(expressWinston.logger(loggerWinston))
 
 // Start polyglot and set the language in the req with the phrases to be used
 app.use(startPolyglot)
