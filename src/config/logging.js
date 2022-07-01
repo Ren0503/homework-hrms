@@ -15,6 +15,9 @@ const esTransportOpts = {
     }
 };
 const esTransport = new ElasticsearchTransport(esTransportOpts);
+esTransport.on('error', (error) => {
+  console.error('Error in logger caught', error);
+});
 const fs = require('fs')
 const logDirectory = 'logs'
 const { combine, timestamp, json } = winston.format
