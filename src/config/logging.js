@@ -1,18 +1,21 @@
 const winston = require('winston')
 const { ElasticsearchTransport } = require('winston-elasticsearch');
 const ecsFormat = require('@elastic/ecs-winston-format')
+const { Client } = require('@elastic/elasticsearch')
+
+const client = new Client({
+    cloud: {
+        id: process.env.ELASTIC_CLOUD_ID,
+    },
+    auth: {
+        username: process.env.ELASTIC_USERNAME,
+        password: process.env.PASSWORD,
+    }
+})
 
 const esTransportOpts = {
     level: 'info',
-    clientOpts: {
-        cloud: {
-            id: process.env.ELASTIC_CLOUD_ID,
-        },
-        auth: {
-            username: process.env.ELASTIC_USERNAME,
-            password: process.env.PASSWORD,
-        }
-    }
+    client,
 };
 const esTransport = new ElasticsearchTransport(esTransportOpts);
 esTransport.on('error', (error) => {
