@@ -1,4 +1,20 @@
 const winston = require('winston')
+const { ElasticsearchTransport } = require('winston-elasticsearch');
+const ecsFormat = require('@elastic/ecs-winston-format')
+
+const esTransportOpts = {
+    level: 'info',
+    clientOpts: {
+        cloud: {
+            id: process.env.ELASTIC_CLOUD_ID,
+        },
+        auth: {
+            username: process.env.ELASTIC_USERNAME,
+            password: process.env.PASSWORD,
+        }
+    }
+};
+const esTransport = new ElasticsearchTransport(esTransportOpts);
 const fs = require('fs')
 const logDirectory = 'logs'
 const { combine, timestamp, json } = winston.format
@@ -23,21 +39,23 @@ const logger = winston.createLogger({
     transports: [
         new winston.transports.File({
             filename: `${logDirectory}/combined.log`,
-            maxsize: 5242880, 
+            maxsize: 5242880,
         }),
         new winston.transports.File({
             filename: `${logDirectory}/app-error.log`,
             level: 'error',
             format: combine(errorFilter(), timestamp(), json()),
-            maxsize: 5242880, 
+            maxsize: 5242880,
         }),
         new winston.transports.File({
             filename: `${logDirectory}/app-info.log`,
             level: 'info',
             format: combine(infoFilter(), timestamp(), json()),
-            maxsize: 5242880, 
+            maxsize: 5242880,
         }),
+        esTransport,
     ],
+    format: ecsFormat(),
 })
 
-module.exports = { logger }
+module.exports = logger
