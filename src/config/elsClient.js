@@ -8,7 +8,7 @@ const {
 const apm = require('elastic-apm-node').start({
     // Override the service name from package.json
     // Allowed characters: a-z, A-Z, 0-9, -, _, and space
-    serviceName: 'homework',
+    serviceName: 'ENVIRONMENT_ALL',
 
     // Use if APM Server requires a secret token
     secretToken: 'em9vdpOruURTPaZJ9t',
@@ -17,7 +17,7 @@ const apm = require('elastic-apm-node').start({
     serverUrl: 'https://f0ef2851a0c84afe86f5ebc25483131c.apm.us-central1.gcp.cloud.es.io:443',
 
     // Set the service environment
-    environment: 'production'
+    environment: 'all'
 })
 const err = new Error('Ups, something broke!')
 
