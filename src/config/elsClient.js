@@ -22,10 +22,10 @@ const esTransportOpts = {
     level: 'info',
     client,
     transformer: (logData) => {
-        console.log('logData', logData)
-        const transformed = ElasticsearchTransformer(logData)
-        console.log('transformed', transformed)
-        return transformed
+       console.log('logData', logData)
+       const transformed = ElasticsearchTransformer(logData);
+       transformed.fields.customField = 'customValue'
+       return transformed;
     }
 };
 const esTransport = new ElasticsearchTransport(esTransportOpts);
