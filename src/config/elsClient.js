@@ -8,7 +8,7 @@ const {
 const apm = require('elastic-apm-node').start({
     // Override the service name from package.json
     // Allowed characters: a-z, A-Z, 0-9, -, _, and space
-    serviceName: '',
+    serviceName: 'homework',
 
     // Use if APM Server requires a secret token
     secretToken: 'em9vdpOruURTPaZJ9t',
