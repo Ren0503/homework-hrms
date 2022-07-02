@@ -37,7 +37,7 @@ app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
 // Logging
-express.use(expressWinston.logger(loggerWinston))
+app.use(expressWinston.logger(loggerWinston))
 
 // Start polyglot and set the language in the req with the phrases to be used
 app.use(startPolyglot)

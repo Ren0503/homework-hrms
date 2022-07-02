@@ -1,6 +1,6 @@
 const path = require('path')
 const fs = require('fs')
-const { logger } = require('../config/logging')
+const logger = require('../config/logging')
 const { encrypt, decrypt } = require('./cryptoData')
 
 // Get path for upload or update new file

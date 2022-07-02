@@ -1,4 +1,4 @@
-const { logger } = require('../config/logging')
+const logger = require('../config/logging')
 
 exports.notFound = (req, res, next) => {
     const error = new Error(req.polyglot.t('404'))
