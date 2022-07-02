@@ -13,6 +13,10 @@ const client = new Client({
     }
 })
 
+client.info()
+    .then((response) => console.log(response))
+    .catch((error) => console.log(error))
+
 const esTransportOpts = {
     level: 'info',
     client,
