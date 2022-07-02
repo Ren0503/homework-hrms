@@ -23,9 +23,9 @@ const esTransportOpts = {
     client,
     transformer: (logData) => {
         console.log('logData', logData)
-        const transformer = new ElasticsearchTransformer(logData)
-        console.log('transformer', transformer)
-        return transformer
+        const transformed = ElasticsearchTransformer(logData)
+        console.log('transformed', transformed)
+        return transformed
     }
 };
 const esTransport = new ElasticsearchTransport(esTransportOpts);
