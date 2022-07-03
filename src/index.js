@@ -4,7 +4,6 @@ const express = require('express')
 const helmet = require('helmet')
 const dotenv = require('dotenv')
 const logger = require('morgan')
-const socket = require('./socket')
 const swaggerUi = require('swagger-ui-express')
 const swaggerFile = require('../swagger_output.json')
 const { notFound, errorHandler } = require('./middleware/errorMiddleware')
@@ -36,6 +35,7 @@ app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
 // Logging
+app.use(logger('dev'))
 app.use(expressWinston.logger(loggerWinston))
 
 // Start polyglot and set the language in the req with the phrases to be used
@@ -76,8 +76,6 @@ const apm = require('elastic-apm-node').start({
 const err = new Error('Ups, something broke!')
 
 apm.captureError(err)
-// Socket IO
-const httpServer = createServer(app);
 
 app.listen(
     PORT,
