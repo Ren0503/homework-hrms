@@ -75,9 +75,6 @@ const apm = require('elastic-apm-node').start({
     // Set the service environment
     environment: 'all'
 })
-const err = new Error('Ups, something broke!')
-
-apm.captureError(err)
 
 app.listen(
     PORT,
