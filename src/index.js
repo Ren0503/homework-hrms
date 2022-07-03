@@ -4,7 +4,6 @@ const express = require('express')
 const helmet = require('helmet')
 const dotenv = require('dotenv')
 const logger = require('morgan')
-const { createServer } = require('http')
 const socket = require('./socket')
 const swaggerUi = require('swagger-ui-express')
 const swaggerFile = require('../swagger_output.json')
@@ -60,12 +59,27 @@ app.use(notFound)
 app.use(errorHandler)
 
 const PORT = process.env.PORT || 5000
+const apm = require('elastic-apm-node').start({
+    // Override the service name from package.json
+    // Allowed characters: a-z, A-Z, 0-9, -, _, and space
+    serviceName: 'ENVIRONMENT_ALL',
 
+    // Use if APM Server requires a secret token
+    secretToken: 'em9vdpOruURTPaZJ9t',
+
+    // Set the custom APM Server URL (default: http://localhost:8200)
+    serverUrl: 'https://f0ef2851a0c84afe86f5ebc25483131c.apm.us-central1.gcp.cloud.es.io:443',
+
+    // Set the service environment
+    environment: 'all'
+})
+const err = new Error('Ups, something broke!')
+
+apm.captureError(err)
 // Socket IO
 const httpServer = createServer(app);
-socket(httpServer);
 
-httpServer.listen(
+app.listen(
     PORT,
     console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`)
 );
