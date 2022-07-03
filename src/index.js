@@ -67,7 +67,7 @@ const apm = require('elastic-apm-node').start({
     // Use if APM Server requires a secret token
     secretToken: 'em9vdpOruURTPaZJ9t',
     
-    api_key: "U21rZXc0RUJ4UTBaSndEVGhqb2M6alVCV09nMWRUOVdWbnUzNi0wVm1SUQ==",
+    apiKey: "U21rZXc0RUJ4UTBaSndEVGhqb2M6alVCV09nMWRUOVdWbnUzNi0wVm1SUQ==",
 
     // Set the custom APM Server URL (default: http://localhost:8200)
     serverUrl: 'https://f0ef2851a0c84afe86f5ebc25483131c.apm.us-central1.gcp.cloud.es.io:443',
