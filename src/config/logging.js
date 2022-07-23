@@ -13,7 +13,7 @@ const name = 'Backend'
 
 const fileTransport = (level) => {
      const fileRotateTransport = new winston.transports.DailyRotateFile({
-      filename: path.join(logDir, /${level}-%DATE%.log),
+      filename: path.join(logDir, `/${level}-%DATE%.log`),
       datePattern: 'YYYY-MM-DD',
       maxSize: '20m',
       level,
