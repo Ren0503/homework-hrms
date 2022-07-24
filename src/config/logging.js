@@ -4,7 +4,7 @@ const ecsFormat = require('@elastic/ecs-winston-format')
 const client = require('./elsClient')
 const fs = require('fs')
 const path = require('path')
-const logDirectory = 'logs'
+const logDir = 'logs'
 // Create the log directory if it does not exist
 if (!fs.existsSync(logDirectory)) {
     fs.mkdirSync(logDirectory)
