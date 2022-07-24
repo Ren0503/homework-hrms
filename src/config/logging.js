@@ -27,7 +27,7 @@ const elasticTransport = (level) => {
     const esTransport = new ElasticsearchTransport({
       client,
       level,
-      indexPrefix: NODE_ENV || 'logs',
+      indexPrefix: process.env.NODE_ENV || 'logs',
       indexSuffixPattern: 'YYYY-MM-DD',
       source: name,
     })
