@@ -47,7 +47,7 @@ for (const l of level) {
 const logger = winston.createLogger({
     transports,
     json: false,
-    format: ecsFormat(),
+    format: ecsFormat({ apmIntegration: false }),
     meta: true,
     msg: 'HTTP {{req.method}} {{req.url}} {{req.body}} {{res.responseTime}}ms',
     expressFormat: true, 
