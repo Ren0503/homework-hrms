@@ -4,6 +4,8 @@ const ecsFormat = require('@elastic/ecs-winston-format')
 const client = require('./elsClient')
 const fs = require('fs')
 const path = require('path')
+require('winston-daily-rotate-file')
+
 const logDir = 'logs'
 // Create the log directory if it does not exist
 if (!fs.existsSync(logDir)) {
@@ -13,7 +15,7 @@ if (!fs.existsSync(logDir)) {
 const name = 'Backend'
 
 const fileTransport = (level) => {
-     const fileRotateTransport = new winston.transports.DailyRotateFile({
+     const fileRotateTransport = winston.transports.DailyRotateFile({
       filename: path.join(logDir, `/${level}-%DATE%.log`),
       datePattern: 'YYYY-MM-DD',
       maxSize: '20m',
