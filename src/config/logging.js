@@ -25,12 +25,12 @@ const fileTransport = (level) => {
     return fileRotateTransport
 }
 
+console.log(client)
 const elasticTransport = (level) => {
     const esTransport = new ElasticsearchTransport({
       client,
       level,
       indexPrefix: process.env.NODE_ENV || 'logs',
-      indexSuffixPattern: 'YYYY-MM-DD',
       source: name,
     })
 
@@ -44,7 +44,6 @@ for (const l of level) {
     transports.push(elasticTransport(l))
 }
 
-console.log(transports)
 const logger = winston.createLogger({
     transports,
     json: false,
