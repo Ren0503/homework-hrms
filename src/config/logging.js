@@ -25,7 +25,6 @@ const fileTransport = (level) => {
     return fileRotateTransport
 }
 
-console.log(client)
 const elasticTransport = (level) => {
     const esTransport = new ElasticsearchTransport({
       client,
