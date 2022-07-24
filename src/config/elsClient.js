@@ -6,10 +6,10 @@ const {
 // Add this to the VERY top of the first file loaded in your app
 
 const client = new Client({
-    node: "https://test-0ee57e.es.us-central1.gcp.cloud.es.io",
+    node: "https://mine-5e002d.es.us-central1.gcp.cloud.es.io",
     auth: {
         username: "elastic",
-        password: "refAtG1RenaQKZpfG7PnB49R",
+        password: "F7TyIRxrQxmolEwvUL2NGm8L",
     }
 })
 
