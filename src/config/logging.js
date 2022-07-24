@@ -6,8 +6,8 @@ const fs = require('fs')
 const path = require('path')
 const logDir = 'logs'
 // Create the log directory if it does not exist
-if (!fs.existsSync(logDirectory)) {
-    fs.mkdirSync(logDirectory)
+if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir)
 }
 
 const name = 'Backend'
