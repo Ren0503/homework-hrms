@@ -44,6 +44,7 @@ for (const l of level) {
     transports.push(elasticTransport(l))
 }
 
+console.log(transports)
 const logger = winston.createLogger({
     transports,
     json: false,
