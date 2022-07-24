@@ -32,6 +32,7 @@ const elasticTransport = (level) => {
       indexPrefix: process.env.NODE_ENV || 'prod',
       source: name,
       transformer: (logData) => {
+        console.log(logData)
         const { ["@timestamp"]: _, ...transformed } = ElasticsearchTransformer(logData);
         return { ...transformed, _ts: Date.now() };
       },
