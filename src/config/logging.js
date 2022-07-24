@@ -1,5 +1,5 @@
 const winston = require('winston')
-const { ElasticsearchTransport } = require('winston-elasticsearch');
+const { ElasticsearchTransport, ElasticsearchTransformer } = require('winston-elasticsearch');
 const ecsFormat = require('@elastic/ecs-winston-format')
 const client = require('./elsClient')
 const fs = require('fs')
