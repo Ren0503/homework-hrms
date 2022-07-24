@@ -39,6 +39,7 @@
     "swagger-autogen": "^2.20.8",
     "swagger-ui-express": "^4.3.0",
     "winston": "^3.7.2",
+    "winston-daily-rotate-file": "^4.7.1",
     "winston-elasticsearch": "^0.17.1"
   },
   "devDependencies": {
