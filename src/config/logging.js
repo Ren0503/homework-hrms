@@ -13,6 +13,18 @@ if (!fs.existsSync(logDir)) {
 }
 
 const name = 'Backend'
+const morganJSONFormat = () => JSON.stringify({
+    method: ':method',
+    url: ':url',
+    http_version: ':http-version',
+    remote_addr: ':remote-addr',
+    remote_addr_forwarded: ':req[x-forwarded-for]', //Get a specific header
+    response_time: ':response-time',
+    status: ':status',
+    content_length: ':res[content-length]',
+    timestamp: ':date[iso]',
+    user_agent: ':user-agent',
+});
 
 const fileTransport = (level) => {
      const fileRotateTransport = new winston.transports.DailyRotateFile({
@@ -30,7 +42,7 @@ const elasticTransport = (level) => {
     const esTransport = new ElasticsearchTransport({
       client,
       level,
-      indexPrefix: process.env.NODE_ENV || 'logs',
+      indexPrefix: process.env.NODE_ENV || 'dev',
       source: name,
     })
 
@@ -47,7 +59,7 @@ for (const l of level) {
 const logger = winston.createLogger({
     transports,
     json: false,
-    format: ecsFormat(),
+    format: morganJSONFormat(),
     meta: true,
     msg: 'HTTP {{req.method}} {{req.url}} {{req.body}} {{res.responseTime}}ms',
     expressFormat: true, 
