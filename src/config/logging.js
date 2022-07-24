@@ -32,6 +32,11 @@ const elasticTransport = (level) => {
       level,
       indexPrefix: process.env.NODE_ENV || 'dev',
       source: name,
+    transformer: (logData) => {
+        console.log(logData)
+    const transformed = ElasticsearchTransformer(logData);
+    return transformed
+ }};
     })
 
     return esTransport
