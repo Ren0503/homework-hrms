@@ -35,6 +35,11 @@ const elasticTransport = (level) => {
         transformer: (logData) => {
             console.log(logData)
             const transformed = ElasticsearchTransformer(logData);
+            transformed.events = {
+                kind: "event",
+                type: level,
+                dataset: `${name}.dataset`
+            }
             return transformed
          }
     })
