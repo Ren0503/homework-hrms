@@ -5,6 +5,7 @@ const client = require('./elsClient')
 const fs = require('fs')
 const path = require('path')
 require('winston-daily-rotate-file')
+const Mail = require('winston-mail').Mail;
 
 const logDir = 'logs'
 // Create the log directory if it does not exist
@@ -46,7 +47,7 @@ for (const l of level) {
 const logger = winston.createLogger({
     transports,
     json: false,
-    format: ecsFormat({ apmIntegration: false }),
+    format: ecsFormat(),
     meta: true,
     msg: 'HTTP {{req.method}} {{req.url}} {{req.body}} {{res.responseTime}}ms',
     expressFormat: true, 
