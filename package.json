@@ -35,7 +35,7 @@
     "node-polyglot": "^2.4.2",
     "rate-limiter-flexible": "^2.3.6",
     "redis": "^4.0.6",
-    "socket.io": "^4.4.1",
+    "socket.io": "^4.8.3",
     "swagger-autogen": "^2.20.8",
     "swagger-ui-express": "^4.3.0",
     "winston": "^3.7.2",
